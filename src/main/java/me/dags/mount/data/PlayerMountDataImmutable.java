@@ -35,18 +35,18 @@ import java.util.Optional;
  * @author dags <dags@dags.me>
  */
 
-public class MountDataImmutable extends AbstractImmutableData<MountDataImmutable, MountDataMutable>
+public class PlayerMountDataImmutable extends AbstractImmutableData<PlayerMountDataImmutable, PlayerMountDataMutable>
 {
-    protected final MountDataCommon common;
+    protected final PlayerMountDataCommon common;
 
-    public MountDataImmutable()
+    public PlayerMountDataImmutable()
     {
-        this(new MountDataCommon());
+        this(new PlayerMountDataCommon());
     }
 
-    public MountDataImmutable(MountDataCommon info)
+    public PlayerMountDataImmutable(PlayerMountDataCommon info)
     {
-        this.common = new MountDataCommon(info);
+        this.common = new PlayerMountDataCommon(info);
         registerGetters();
     }
 
@@ -69,19 +69,19 @@ public class MountDataImmutable extends AbstractImmutableData<MountDataImmutable
     }
 
     @Override
-    public <E> Optional<MountDataImmutable> with(Key<? extends BaseValue<E>> key, E e)
+    public <E> Optional<PlayerMountDataImmutable> with(Key<? extends BaseValue<E>> key, E e)
     {
         return Optional.empty();
     }
 
     @Override
-    public MountDataMutable asMutable()
+    public PlayerMountDataMutable asMutable()
     {
-        return new MountDataMutable(common);
+        return new PlayerMountDataMutable(common);
     }
 
     @Override
-    public int compareTo(MountDataImmutable o)
+    public int compareTo(PlayerMountDataImmutable o)
     {
         return 0;
     }
@@ -89,7 +89,7 @@ public class MountDataImmutable extends AbstractImmutableData<MountDataImmutable
     @Override
     public int getContentVersion()
     {
-        return MountDataCommon.DATA_VERSION;
+        return PlayerMountDataCommon.DATA_VERSION;
     }
 
     @Override

@@ -26,7 +26,7 @@ package me.dags.mount;
 
 import com.flowpowered.math.imaginary.Quaterniond;
 import com.flowpowered.math.vector.Vector3d;
-import me.dags.mount.data.MountDataCommon;
+import me.dags.mount.data.PlayerMountDataCommon;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.block.PassableProperty;
@@ -58,12 +58,12 @@ public class Mount implements Consumer<Task>
 {
     private final Player player;
     private final Living vehicle;
-    private final MountDataCommon mountData;
+    private final PlayerMountDataCommon mountData;
     private final Handler movementHandler;
 
     private transient Optional<Task> task = Optional.empty();
 
-    public Mount(Player player, Living mount, MountDataCommon data)
+    public Mount(Player player, Living mount, PlayerMountDataCommon data)
     {
         this.player = player;
         this.vehicle = mount;

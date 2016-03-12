@@ -40,7 +40,7 @@ import java.util.Optional;
  * @author dags <dags@dags.me>
  */
 
-public class MountDataCommon
+public class PlayerMountDataCommon
 {
     protected static final int DATA_VERSION = 1;
 
@@ -54,10 +54,10 @@ public class MountDataCommon
     protected transient EntityType entityType = EntityTypes.PIG;
     protected transient ItemType itemType = ItemTypes.SADDLE;
 
-    protected MountDataCommon()
+    protected PlayerMountDataCommon()
     {}
 
-    protected MountDataCommon(MountDataCommon info)
+    protected PlayerMountDataCommon(PlayerMountDataCommon info)
     {
         this.type = info.type;
         this.item = info.item;
@@ -69,7 +69,7 @@ public class MountDataCommon
         this.itemType = info.itemType;
     }
 
-    public MountDataCommon set(DataView dataContainer)
+    public PlayerMountDataCommon set(DataView dataContainer)
     {
         this.type = dataContainer.getString(MountKeys.TYPE.getQuery()).get();
         this.item = dataContainer.getString(MountKeys.ITEM.getQuery()).get();
@@ -126,12 +126,12 @@ public class MountDataCommon
 
     public Value<Boolean> fly()
     {
-        return Sponge.getRegistry().getValueFactory().createValue(MountKeys.CAN_FLY, true, canFly);
+        return Sponge.getRegistry().getValueFactory().createValue(MountKeys.CAN_FLY, false, canFly);
     }
 
     public Value<Boolean> invincible()
     {
-        return Sponge.getRegistry().getValueFactory().createValue(MountKeys.INVINCIBLE, true, invincible);
+        return Sponge.getRegistry().getValueFactory().createValue(MountKeys.INVINCIBLE, false, invincible);
     }
 
     public Value<Double> moveSpeed()
@@ -154,7 +154,7 @@ public class MountDataCommon
                 .set(MountKeys.LEASH_SPEED, leashSpeed);
     }
 
-    public static Optional<MountDataCommon> from(DataView dataContainer)
+    public static Optional<PlayerMountDataCommon> fromContainer(DataView dataContainer)
     {
         if (!dataContainer.contains(
                 MountKeys.TYPE.getQuery(),
@@ -166,6 +166,6 @@ public class MountDataCommon
         {
             return Optional.empty();
         }
-        return Optional.of(new MountDataCommon().set(dataContainer));
+        return Optional.of(new PlayerMountDataCommon().set(dataContainer));
     }
 }

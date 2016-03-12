@@ -34,27 +34,27 @@ import java.util.Optional;
  * @author dags <dags@dags.me>
  */
 
-public class MountDataBuilder implements DataManipulatorBuilder<MountDataMutable, MountDataImmutable>
+public class PlayerMountDataBuilder implements DataManipulatorBuilder<PlayerMountDataMutable, PlayerMountDataImmutable>
 {
     @Override
-    public MountDataMutable create()
+    public PlayerMountDataMutable create()
     {
-        return new MountDataMutable();
+        return new PlayerMountDataMutable();
     }
 
     @Override
-    public Optional<MountDataMutable> createFrom(DataHolder dataHolder)
+    public Optional<PlayerMountDataMutable> createFrom(DataHolder dataHolder)
     {
-        return Optional.of(dataHolder.get(MountDataMutable.class).orElse(create()));
+        return Optional.of(dataHolder.get(PlayerMountDataMutable.class).orElse(create()));
     }
 
     @Override
-    public Optional<MountDataMutable> build(DataView dataView)
+    public Optional<PlayerMountDataMutable> build(DataView dataView)
     {
-        Optional<MountDataCommon> mountInfo = MountDataCommon.from(dataView);
+        Optional<PlayerMountDataCommon> mountInfo = PlayerMountDataCommon.fromContainer(dataView);
         if (mountInfo.isPresent())
         {
-            return Optional.of(new MountDataMutable(mountInfo.get()));
+            return Optional.of(new PlayerMountDataMutable(mountInfo.get()));
         }
         return Optional.empty();
     }

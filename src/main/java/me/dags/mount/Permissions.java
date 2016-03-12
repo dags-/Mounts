@@ -41,6 +41,8 @@ public class Permissions
     public static final String COMMAND_SPEED = "mounts.command.speed";
     public static final String COMMAND_TYPE = "mounts.command.type";
 
+    public static final String MOUNT_USE = "mounts.use";
+
     public static final String TYPE_STUB = "mounts.type.";
 
     public static boolean allowedType(Player player, String type)

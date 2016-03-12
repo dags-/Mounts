@@ -45,16 +45,16 @@ import java.util.Optional;
  * @author dags <dags@dags.me>
  */
 
-public class MountDataMutable extends AbstractData<MountDataMutable, MountDataImmutable>
+public class PlayerMountDataMutable extends AbstractData<PlayerMountDataMutable, PlayerMountDataImmutable>
 {
-    private final MountDataCommon common;
+    private final PlayerMountDataCommon common;
 
-    public MountDataMutable()
+    public PlayerMountDataMutable()
     {
-        this(new MountDataCommon());
+        this(new PlayerMountDataCommon());
     }
 
-    public MountDataMutable(MountDataCommon info)
+    public PlayerMountDataMutable(PlayerMountDataCommon info)
     {
         this.common = info;
         registerGettersAndSetters();
@@ -125,31 +125,31 @@ public class MountDataMutable extends AbstractData<MountDataMutable, MountDataIm
     }
 
     @Override
-    public Optional<MountDataMutable> fill(DataHolder dataHolder, MergeFunction mergeFunction)
+    public Optional<PlayerMountDataMutable> fill(DataHolder dataHolder, MergeFunction mergeFunction)
     {
         return Optional.empty();
     }
 
     @Override
-    public Optional<MountDataMutable> from(DataContainer dataContainer)
+    public Optional<PlayerMountDataMutable> from(DataContainer dataContainer)
     {
         return from(dataContainer);
     }
 
     @Override
-    public MountDataMutable copy()
+    public PlayerMountDataMutable copy()
     {
-        return new MountDataMutable(common);
+        return new PlayerMountDataMutable(common);
     }
 
     @Override
-    public MountDataImmutable asImmutable()
+    public PlayerMountDataImmutable asImmutable()
     {
-        return new MountDataImmutable(common);
+        return new PlayerMountDataImmutable(common);
     }
 
     @Override
-    public int compareTo(MountDataMutable o)
+    public int compareTo(PlayerMountDataMutable o)
     {
         return 0;
     }
@@ -157,7 +157,7 @@ public class MountDataMutable extends AbstractData<MountDataMutable, MountDataIm
     @Override
     public int getContentVersion()
     {
-        return MountDataCommon.DATA_VERSION;
+        return PlayerMountDataCommon.DATA_VERSION;
     }
 
     @Override

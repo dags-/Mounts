@@ -27,7 +27,7 @@ package me.dags.mount;
 import me.dags.commandbus.annotation.Caller;
 import me.dags.commandbus.annotation.Command;
 import me.dags.commandbus.annotation.One;
-import me.dags.mount.data.MountDataMutable;
+import me.dags.mount.data.PlayerMountDataMutable;
 import me.dags.mount.data.MountKeys;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
@@ -75,41 +75,41 @@ public class MountCommands
         }
     }
 
-    @Command(aliases = {"purge", "p"}, parent = "mount", desc = "Purge all spawned mounts", perm = Permissions.COMMAND_PURGE)
+    @Command(aliases = {"purge", "p"}, parent = "mount", perm = Permissions.COMMAND_PURGE)
     public void purge(@Caller Player player)
     {
         tell(player, text("Purging mounts..."));
         MountsPlugin.clearMounts();
     }
 
-    @Command(aliases = {"create", "c"}, parent = "mount", desc = "Create a new mount", perm = Permissions.COMMAND_CREATE)
+    @Command(aliases = {"create", "c"}, parent = "mount", perm = Permissions.COMMAND_CREATE)
     public void create0(@Caller Player player)
     {
         create1(player, "pig");
     }
 
-    @Command(aliases = {"create", "c"}, parent = "mount", desc = "Create a new mount", perm = Permissions.COMMAND_CREATE)
+    @Command(aliases = {"create", "c"}, parent = "mount", perm = Permissions.COMMAND_CREATE)
     public void create1(@Caller Player player, @One("entity") String type)
     {
-        if (!player.get(MountDataMutable.class).isPresent())
+        if (!player.get(PlayerMountDataMutable.class).isPresent())
         {
             tell(player, text("See '"), stress("/help mount"), text("' for more on setting up your mount!"));
         }
 
-        MountDataMutable data = new MountDataMutable();
+        PlayerMountDataMutable data = new PlayerMountDataMutable();
         if (attemptSetType(player, data, type))
         {
             tell(player, text("Successfully created your new mount!"));
         }
     }
 
-    @Command(aliases = {"type", "t"}, parent = "mount", desc = "Change your mount to a different creature", perm = Permissions.COMMAND_TYPE)
+    @Command(aliases = {"type", "t"}, parent = "mount", perm = Permissions.COMMAND_TYPE)
     public void type(@Caller Player player, @One("entity") String type)
     {
-        Optional<MountDataMutable> optional = player.get(MountDataMutable.class);
+        Optional<PlayerMountDataMutable> optional = player.get(PlayerMountDataMutable.class);
         if (optional.isPresent())
         {
-            MountDataMutable data = optional.get();
+            PlayerMountDataMutable data = optional.get();
             attemptSetType(player, data, type);
         }
         else
@@ -118,10 +118,10 @@ public class MountCommands
         }
     }
 
-    @Command(aliases = {"item", "i"}, parent = "mount", desc = "Change the item you use to spawn your mount", perm = Permissions.COMMAND_ITEM)
+    @Command(aliases = {"item", "i"}, parent = "mount", perm = Permissions.COMMAND_ITEM)
     public void item(@Caller Player player)
     {
-        Optional<MountDataMutable> optional = player.get(MountDataMutable.class);
+        Optional<PlayerMountDataMutable> optional = player.get(PlayerMountDataMutable.class);
         if (optional.isPresent())
         {
             Optional<ItemStack> inHand = player.getItemInHand();
@@ -141,7 +141,7 @@ public class MountCommands
         tell(player, err("You must first create a mount before your can change its properties!"));
     }
 
-    @Command(aliases = {"normal", "l"}, parent = "mount speed", desc = "Set your mount's speed", perm = Permissions.COMMAND_SPEED)
+    @Command(aliases = {"normal", "n"}, parent = "mount speed", perm = Permissions.COMMAND_SPEED)
     public void speedNormal(@Caller Player player, @One("speed") double speed)
     {
         if (speeds.outsideOfRange(speed))
@@ -156,7 +156,7 @@ public class MountCommands
         }
     }
 
-    @Command(aliases = {"leash", "leashed", "l"}, parent = "mount speed", desc = "Set your mount's leashed speed", perm = Permissions.COMMAND_SPEED)
+    @Command(aliases = {"leash", "leashed", "l"}, parent = "mount speed", perm = Permissions.COMMAND_SPEED)
     public void speedLeash(@Caller Player player, @One("speed") double speed)
     {
         if (speeds.outsideOfRange(speed))
@@ -171,8 +171,8 @@ public class MountCommands
         }
     }
 
-    @Command(aliases = {"canfly", "fly", "f"}, parent = "mount", desc = "Set whether or not your mount can fly", perm = Permissions.COMMAND_FLY)
-    public void fly(@Caller Player player, @One boolean fly)
+    @Command(aliases = {"canfly", "fly", "f"}, parent = "mount", perm = Permissions.COMMAND_FLY)
+    public void fly(@Caller Player player, boolean fly)
     {
         if (set(player, MountKeys.CAN_FLY, fly))
         {
@@ -180,8 +180,8 @@ public class MountCommands
         }
     }
 
-    @Command(aliases = {"invincible", "i"}, parent = "mount", desc = "Set whether your mount is invincible or not", perm = Permissions.COMMAND_INVINCIBLE)
-    public void invincible(@Caller Player player, @One boolean invincible)
+    @Command(aliases = {"invincible", "i"}, parent = "mount", perm = Permissions.COMMAND_INVINCIBLE)
+    public void invincible(@Caller Player player, boolean invincible)
     {
         if (set(player, MountKeys.INVINCIBLE, invincible))
         {
@@ -216,10 +216,10 @@ public class MountCommands
 
     private <T> boolean set(Player player, Key<Value<T>> key, T value)
     {
-        Optional<MountDataMutable> optional = player.get(MountDataMutable.class);
+        Optional<PlayerMountDataMutable> optional = player.get(PlayerMountDataMutable.class);
         if (optional.isPresent())
         {
-            MountDataMutable data = optional.get();
+            PlayerMountDataMutable data = optional.get();
             data.set(key, value);
             player.offer(data);
             return true;
@@ -228,7 +228,7 @@ public class MountCommands
         return false;
     }
 
-    private boolean attemptSetType(Player player, MountDataMutable data, String type)
+    private boolean attemptSetType(Player player, PlayerMountDataMutable data, String type)
     {
         if (Permissions.allowedType(player, type))
         {

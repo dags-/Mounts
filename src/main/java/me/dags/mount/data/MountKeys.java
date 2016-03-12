@@ -35,10 +35,15 @@ import org.spongepowered.api.data.value.mutable.Value;
 
 public class MountKeys
 {
-    public static final Key<Value<String>> TYPE = KeyFactory.makeSingleKey(String.class, Value.class, DataQuery.of("ENTITY_TYPE"));
-    public static final Key<Value<String>> ITEM = KeyFactory.makeSingleKey(String.class, Value.class, DataQuery.of("SPAWN_ITEM"));
-    public static final Key<Value<Boolean>> CAN_FLY = KeyFactory.makeSingleKey(Boolean.class, Value.class, DataQuery.of("CAN_FLY"));
-    public static final Key<Value<Boolean>> INVINCIBLE = KeyFactory.makeSingleKey(Boolean.class, Value.class, DataQuery.of("INVINCIBLE"));
-    public static final Key<Value<Double>> MOVE_SPEED = KeyFactory.makeSingleKey(Double.class, Value.class, DataQuery.of("MOVE_SPEED"));
-    public static final Key<Value<Double>> LEASH_SPEED = KeyFactory.makeSingleKey(Double.class, Value.class, DataQuery.of("LEASH_SPEED"));
+    public static final Key<Value<String>> TYPE = single(String.class, "ENTITY_TYPE");
+    public static final Key<Value<String>> ITEM = single(String.class, "SPAWN_ITEM");
+    public static final Key<Value<Boolean>> CAN_FLY = single(Boolean.class, "CAN_FLY");
+    public static final Key<Value<Boolean>> INVINCIBLE = single(Boolean.class, "INVINCIBLE");
+    public static final Key<Value<Double>> MOVE_SPEED = single(Double.class, "MOVE_SPEED");
+    public static final Key<Value<Double>> LEASH_SPEED = single(Double.class, "LEASH_SPEED");
+
+    private static <T> Key<Value<T>> single(Class<T> type, String query)
+    {
+        return KeyFactory.makeSingleKey(type, Value.class, DataQuery.of(query));
+    }
 }

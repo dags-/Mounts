@@ -26,9 +26,9 @@ package me.dags.mount;
 
 import com.google.inject.Inject;
 import me.dags.commandbus.CommandBus;
-import me.dags.mount.data.MountDataBuilder;
-import me.dags.mount.data.MountDataImmutable;
-import me.dags.mount.data.MountDataMutable;
+import me.dags.mount.data.PlayerMountDataBuilder;
+import me.dags.mount.data.PlayerMountDataImmutable;
+import me.dags.mount.data.PlayerMountDataMutable;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.AbstractConfigurationLoader;
@@ -73,7 +73,7 @@ public class MountsPlugin
     public void preinit(GamePreInitializationEvent event)
     {
         logger.info("Registering MountData...");
-        Sponge.getDataManager().register(MountDataMutable.class, MountDataImmutable.class, new MountDataBuilder());
+        Sponge.getDataManager().register(PlayerMountDataMutable.class, PlayerMountDataImmutable.class, new PlayerMountDataBuilder());
     }
 
     @Listener
@@ -94,9 +94,9 @@ public class MountsPlugin
     public void use(InteractBlockEvent.Secondary event, @Root Player player)
     {
         Optional<ItemStack> inHand = player.getItemInHand();
-        if (inHand.isPresent() && !player.getVehicle().isPresent())
+        if (player.hasPermission(Permissions.MOUNT_USE) && inHand.isPresent() && !player.getVehicle().isPresent())
         {
-            player.get(MountDataMutable.class)
+            player.get(PlayerMountDataMutable.class)
                     .filter(data -> data.itemType() == inHand.get().getItem())
                     .flatMap(data -> data.getPlayerMount(player))
                     .ifPresent(mount -> mount.mountPlayer(this));
