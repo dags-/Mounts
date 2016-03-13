@@ -16,6 +16,7 @@ Mounts can travel at two different speeds, one when holding a leash item, and on
 Commands
 ====
 - `/mount create` - create a new mount
+- `/mount remove` - delete your mount
 - `/mount type <entity_type>` - set your mount to the given entity type
 - `/mount item` - set the item type you must be holding to spawn your mount
 - `/mount fly` - toggle whether or not your mount can fly (certain flying mounts will fly regardless)
@@ -30,6 +31,7 @@ _Entity names are as defined by SpongeAPI, and generally single word names (i.e.
 Permissions
 ====
 - `mounts.command.create` - allows use of the `/mount create` command
+- `mounts.command.remove.self` - allows use of the `/mount remove` command
 - `mounts.command.fly` - allows use of the `/mount fly` command
 - `mounts.command.invincible` - allows use of the `/mount invincible` command
 - `mounts.command.item` - allows use of the `/mount item` command
