@@ -11,7 +11,7 @@ Once a mount has been created using the `/mount create` command, the user can sp
 
 Mounts will automatically move in the direction that the player is looking (including flying up/down if enabled).
 
-Mounts can travel at two different speeds, one when holding a leash item, and one with any other (or no) item (both speeds are configurable). Minumum and maximum speeds can be set in the config file.
+Mounts can travel at two different speeds, one when holding a leash item, and one with any other (or no) item (both speeds are configurable). Global minumum and maximum speeds can be set in the config file.
 
 Commands
 ====
@@ -43,5 +43,6 @@ Permissions
 Notes
 ====
 - **If the server does not shut down correctly, some mount entities may persist in the world after it starts again**
+- **Flying around quickly may put stress on the server's hardware as it has to load chunks more quickly than usual**
 - User experience may vary depending on latency
 - Aggressive mounts may still try to attack you in Survival/Adventure mode
