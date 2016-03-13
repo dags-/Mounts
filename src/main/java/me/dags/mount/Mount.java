@@ -38,6 +38,8 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
@@ -73,13 +75,18 @@ public class Mount implements Consumer<Task>
 
     public void mountPlayer(Object plugin)
     {
-        if (player.getWorld().spawnEntity(vehicle, Cause.of(NamedCause.simulated(player))))
+        Cause cause = Cause.source(SpawnCause.builder()
+                .type(SpawnTypes.PLUGIN).build())
+                .named(NamedCause.simulated(player)).build();
+
+        if (player.getWorld().spawnEntity(vehicle, cause))
         {
             vehicle.offer(Keys.DISPLAY_NAME, Text.of(player.getName() + "'s Epic Mount!"));
             Sponge.getScheduler().createTaskBuilder()
                     .delayTicks(1L)
                     .execute(() -> {
                         player.setVehicle(vehicle);
+                        vehicle.offer(Keys.TAMED_OWNER, Optional.of(player.getUniqueId()));
                         Sponge.getScheduler().createTaskBuilder()
                                 .delayTicks(1L)
                                 .intervalTicks(1L)

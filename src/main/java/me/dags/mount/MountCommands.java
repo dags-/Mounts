@@ -30,12 +30,10 @@ import me.dags.commandbus.annotation.One;
 import me.dags.dalib.commands.CommandMessenger;
 import me.dags.mount.data.MountKeys;
 import me.dags.mount.data.PlayerMountDataMutable;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
 
@@ -86,7 +84,7 @@ public class MountCommands
         }
 
         PlayerMountDataMutable data = new PlayerMountDataMutable();
-        if (attemptSetType(player, data, type))
+        if (setType(player, data, type))
         {
             messenger().info("Successfully created your new mount!").tell(player);
         }
@@ -99,7 +97,7 @@ public class MountCommands
         if (optional.isPresent())
         {
             PlayerMountDataMutable data = optional.get();
-            attemptSetType(player, data, type);
+            setType(player, data, type);
         }
         else
         {
@@ -167,31 +165,30 @@ public class MountCommands
     }
 
     @Command(aliases = {"canfly", "fly", "f"}, parent = "mount", perm = Permissions.COMMAND_FLY)
-    public void fly(@Caller Player player, boolean fly)
+    public void fly(@Caller Player player)
     {
-        if (set(player, MountKeys.CAN_FLY, fly))
-        {
-            messenger().info("Set your mount's ability to fly to: ").stress(fly).tell(player);
-        }
+        toggle(player, MountKeys.CAN_FLY, "flight");
     }
 
     @Command(aliases = {"invincible", "i"}, parent = "mount", perm = Permissions.COMMAND_INVINCIBLE)
-    public void invincible(@Caller Player player, boolean invincible)
+    public void invincible(@Caller Player player)
     {
-        if (set(player, MountKeys.INVINCIBLE, invincible))
-        {
-            messenger().info("Set your mount's invincibility to: ").stress(invincible).tell(player);
-        }
+        toggle(player, MountKeys.INVINCIBLE, "invincibility");
     }
 
-    private void tell(Player player, Text.Builder... builders)
+    private boolean toggle(Player player, Key<Value<Boolean>> key, String settingName)
     {
-        Text.Builder wrapper = Text.builder();
-        for (Text.Builder b : builders)
+        Optional<PlayerMountDataMutable> optional = player.get(PlayerMountDataMutable.class);
+        if (optional.isPresent())
         {
-            wrapper.append(b.build());
+            PlayerMountDataMutable data = optional.get();
+            Boolean value = !data.get(key).get();
+            player.offer(data.set(key, value));
+            messenger().info("Toggled ").stress(settingName).info(" " + (value ? "on" : "off")).tell(player);
+            return true;
         }
-        player.sendMessage(wrapper.build());
+        messenger().error("You must first create a mount before your can change its properties!").tell(player);
+        return false;
     }
 
     private <T> boolean set(Player player, Key<Value<T>> key, T value)
@@ -208,7 +205,7 @@ public class MountCommands
         return false;
     }
 
-    private boolean attemptSetType(Player player, PlayerMountDataMutable data, String type)
+    private boolean setType(Player player, PlayerMountDataMutable data, String type)
     {
         if (Permissions.allowedType(player, type))
         {

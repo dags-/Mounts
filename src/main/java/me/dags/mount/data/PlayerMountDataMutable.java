@@ -60,7 +60,7 @@ public class PlayerMountDataMutable extends AbstractData<PlayerMountDataMutable,
         registerGettersAndSetters();
     }
 
-    public Optional<Mount> getPlayerMount(Player player)
+    public Optional<Mount> createPlayMount(Player player)
     {
         Optional<Living> optional = create(common.entityType, Living.class, player.getLocation());
         if (optional.isPresent())

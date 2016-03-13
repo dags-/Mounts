@@ -54,7 +54,7 @@ import java.util.Optional;
  * @author dags <dags@dags.me>
  */
 
-@Plugin(name = "Mounts", id = "dags.mounts", version = "1.0")
+@Plugin(name = "Mounts", id = "dags.mounts", version = "1.0.0", description = "Turn mobs into mounts!", authors = "dags", url = "https://github.com/dags-/Mounts")
 public class MountsPlugin
 {
     @Inject
@@ -95,7 +95,7 @@ public class MountsPlugin
         {
             player.get(PlayerMountDataMutable.class)
                     .filter(data -> data.itemType() == inHand.get().getItem())
-                    .flatMap(data -> data.getPlayerMount(player))
+                    .flatMap(data -> data.createPlayMount(player))
                     .ifPresent(mount -> mount.mountPlayer(this));
         }
     }
