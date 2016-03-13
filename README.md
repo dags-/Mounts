@@ -26,7 +26,7 @@ Commands
 - `/mount reload` - reloads the mounts config file from disk
 - `/mount purge` - removes all active mounts from all worlds
 
-_Entity names are as defined by SpongeAPI, and generally single word names (i.e. no spaces)_
+_Entity names are as defined by SpongeAPI, and generally single, no-spaces words_
 
 Permissions
 ====
