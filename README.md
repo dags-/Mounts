@@ -1,5 +1,5 @@
 # Mounts
-Mounts is a Sponge plugin that allows players to create personal, rideable mount from Minecraft mobs.
+Mounts is a Sponge plugin that allows players to create personal, rideable mounts from Minecraft mobs.
 
 [![Build Status](https://travis-ci.org/dags-/Mounts.svg?branch=master)](https://travis-ci.org/dags-/Mounts)
 
