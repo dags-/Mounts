@@ -27,20 +27,16 @@ package me.dags.mount;
 import me.dags.commandbus.annotation.Caller;
 import me.dags.commandbus.annotation.Command;
 import me.dags.commandbus.annotation.One;
-import me.dags.mount.data.PlayerMountDataMutable;
+import me.dags.dalib.commands.CommandMessenger;
 import me.dags.mount.data.MountKeys;
-import ninja.leaping.configurate.objectmapping.Setting;
+import me.dags.mount.data.PlayerMountDataMutable;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.text.format.TextColors;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 
 /**
@@ -50,36 +46,30 @@ import java.util.Optional;
 @ConfigSerializable
 public class MountCommands
 {
-    @Setting (comment = "Set the allowed range of speeds for Mounts")
-    private MountSpeeds speeds = new MountSpeeds();
-    @Setting (comment = "Set command message colors")
-    private CommandColors colors = new CommandColors();
+    private final MountsPlugin plugin;
 
-    private transient Path path = Paths.get("");
-
-    protected MountCommands setPath(Path path)
+    protected MountCommands(MountsPlugin plugin)
     {
-        this.path = path;
-        return this;
+        this.plugin = plugin;
+    }
+
+    private CommandMessenger.Builder messenger()
+    {
+        return plugin.config().commandMessenger.builder();
     }
 
     @Command(aliases = {"reload", "r"}, parent = "mount", perm = Permissions.COMMAND_RELOAD)
     public void reload(@Caller Player player)
     {
-        tell(player, text("Reloading..."));
-        Optional<MountCommands> commands = MountsPlugin.fromHocon(path, MountCommands.class);
-        if (commands.isPresent())
-        {
-            this.speeds = commands.get().speeds;
-            this.colors = commands.get().colors;
-        }
+        messenger().info("Reloading...").tell(player);
+        plugin.reloadConfig();
     }
 
     @Command(aliases = {"purge", "p"}, parent = "mount", perm = Permissions.COMMAND_PURGE)
     public void purge(@Caller Player player)
     {
-        tell(player, text("Purging mounts..."));
-        MountsPlugin.clearMounts();
+        messenger().info("Reloading...").tell(player);
+        plugin.clearMounts();
     }
 
     @Command(aliases = {"create", "c"}, parent = "mount", perm = Permissions.COMMAND_CREATE)
@@ -93,13 +83,13 @@ public class MountCommands
     {
         if (!player.get(PlayerMountDataMutable.class).isPresent())
         {
-            tell(player, text("See '"), stress("/help mount"), text("' for more on setting up your mount!"));
+            messenger().info("See '").stress("/help mount").info("' for more on setting up your mount!").tell(player);
         }
 
         PlayerMountDataMutable data = new PlayerMountDataMutable();
         if (attemptSetType(player, data, type))
         {
-            tell(player, text("Successfully created your new mount!"));
+            messenger().info("Successfully created your new mount!").tell(player);
         }
     }
 
@@ -114,7 +104,7 @@ public class MountCommands
         }
         else
         {
-            tell(player, err("You must first create a mount before your can change it's type!"));
+            messenger().error("You must first create a mount before your can change it's type!").tell(player);
         }
     }
 
@@ -131,43 +121,49 @@ public class MountCommands
                 if (optional.get().setItemType(item))
                 {
                     player.offer(optional.get());
-                    tell(player, text("You have set your mount's item to: "), stress(item));
+                    messenger().info("You have set your mount's item to: ").stress(item).tell(player);
                 }
                 return;
             }
-            tell(player, err("You must be holding an item to use this command!"));
+            messenger().error("You must be holding an item to use this command!").tell(player);
             return;
         }
-        tell(player, err("You must first create a mount before your can change its properties!"));
+        messenger().error("You must first create a mount before your can change its properties!").tell(player);
     }
 
     @Command(aliases = {"normal", "n"}, parent = "mount speed", perm = Permissions.COMMAND_SPEED)
     public void speedNormal(@Caller Player player, @One("speed") double speed)
     {
-        if (speeds.outsideOfRange(speed))
+        if (plugin.config().mountSpeeds.outsideOfRange(speed))
         {
-            tell(player, stress(speed), err(" is not within the allowed range: "), stress(speeds.getRange()));
+            messenger().stress(speed)
+                    .info(" is not within the allowed range: ")
+                    .stress(plugin.config().mountSpeeds.getRange())
+                    .tell(player);
             return;
         }
 
         if (set(player, MountKeys.MOVE_SPEED, speed))
         {
-            tell(player, text("Your mount's speed has been set to: "), stress(speed));
+            messenger().info("Your mount's speed has been set to: ").stress(speed).tell(player);
         }
     }
 
     @Command(aliases = {"leash", "leashed", "l"}, parent = "mount speed", perm = Permissions.COMMAND_SPEED)
     public void speedLeash(@Caller Player player, @One("speed") double speed)
     {
-        if (speeds.outsideOfRange(speed))
+        if (plugin.config().mountSpeeds.outsideOfRange(speed))
         {
-            tell(player, stress(speed), err(" is not within the allowed range: "), stress(speeds.getRange()));
+            messenger().stress(speed)
+                    .info(" is not within the allowed range: ")
+                    .stress(plugin.config().mountSpeeds.getRange())
+                    .tell(player);
             return;
         }
 
         if (set(player, MountKeys.LEASH_SPEED, speed))
         {
-            tell(player, text("Your mount's leashed speed has been set to: "), stress(speed));
+            messenger().info("Your mount's leashed speed has been set to: ").stress(speed).tell(player);
         }
     }
 
@@ -176,7 +172,7 @@ public class MountCommands
     {
         if (set(player, MountKeys.CAN_FLY, fly))
         {
-            tell(player, text("Set your mount's ability to fly to: "), stress(fly));
+            messenger().info("Set your mount's ability to fly to: ").stress(fly).tell(player);
         }
     }
 
@@ -185,23 +181,8 @@ public class MountCommands
     {
         if (set(player, MountKeys.INVINCIBLE, invincible))
         {
-            tell(player, text("Set your mount's invincibility to: "), stress(invincible));
+            messenger().info("Set your mount's invincibility to: ").stress(invincible).tell(player);
         }
-    }
-
-    private Text.Builder text(Object message)
-    {
-        return Text.builder(message.toString()).color(colors.textColor);
-    }
-
-    private Text.Builder stress(Object message)
-    {
-        return Text.builder(message.toString()).color(colors.highlightColor);
-    }
-
-    private Text.Builder err(Object message)
-    {
-        return Text.builder(message.toString()).color(colors.errorColor);
     }
 
     private void tell(Player player, Text.Builder... builders)
@@ -224,7 +205,7 @@ public class MountCommands
             player.offer(data);
             return true;
         }
-        tell(player, err("You must first create a mount before your can change its properties!"));
+        messenger().error("You must first create a mount before your can change its properties!").tell(player);
         return false;
     }
 
@@ -235,43 +216,13 @@ public class MountCommands
             if (data.setEntityType(type))
             {
                 player.offer(data);
-                tell(player, text("Set your mount to: "), stress(type));
+                messenger().info("Set your mount to: ").stress(type).tell(player);
                 return true;
             }
-            tell(player, stress(type), err(" is not a valid mount type!"));
+            messenger().stress(type).info(" is not a valid mount type!").tell(player);
             return true;
         }
-        tell(player, err("You do not have permission for mount type: "), stress(type));
+        messenger().warn("You do not have permission for mount type: ").stress(type).tell(player);
         return false;
-    }
-
-    @ConfigSerializable
-    public static class MountSpeeds
-    {
-        @Setting
-        private double minSpeed = 0.01D;
-        @Setting
-        private double maxSpeed = 5.0D;
-
-        private boolean outsideOfRange(double test)
-        {
-            return test < minSpeed || test > maxSpeed;
-        }
-
-        private String getRange()
-        {
-            return minSpeed + " < x < " + maxSpeed;
-        }
-    }
-
-    @ConfigSerializable
-    public static class CommandColors
-    {
-        @Setting
-        private TextColor textColor = TextColors.DARK_AQUA;
-        @Setting
-        private TextColor highlightColor = TextColors.DARK_PURPLE;
-        @Setting
-        private TextColor errorColor = TextColors.GRAY;
     }
 }

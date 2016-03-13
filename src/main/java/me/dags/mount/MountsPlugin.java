@@ -26,18 +26,14 @@ package me.dags.mount;
 
 import com.google.inject.Inject;
 import me.dags.commandbus.CommandBus;
+import me.dags.dalib.config.ConfigLoader;
 import me.dags.mount.data.PlayerMountDataBuilder;
 import me.dags.mount.data.PlayerMountDataImmutable;
 import me.dags.mount.data.PlayerMountDataMutable;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
-import ninja.leaping.configurate.loader.AbstractConfigurationLoader;
-import ninja.leaping.configurate.objectmapping.ObjectMapper;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.config.ConfigDir;
+import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
@@ -51,8 +47,6 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.text.Text;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -60,14 +54,16 @@ import java.util.Optional;
  * @author dags <dags@dags.me>
  */
 
-@Plugin(name = "Mounts", id = "me.dags.mounts", version = "1.0")
+@Plugin(name = "Mounts", id = "dags.mounts", version = "1.0")
 public class MountsPlugin
 {
-    private final Logger logger = LoggerFactory.getLogger("Mounts");
-
     @Inject
-    @ConfigDir(sharedRoot = false)
-    private Path configDir;
+    @DefaultConfig(sharedRoot = false)
+    private Path configPath;
+    private Config config = new Config();
+
+    private final Logger logger = LoggerFactory.getLogger("Mounts");
+    private final ConfigLoader configLoader = ConfigLoader.newInstance();
 
     @Listener
     public void preinit(GamePreInitializationEvent event)
@@ -79,8 +75,9 @@ public class MountsPlugin
     @Listener
     public void init(GameInitializationEvent event)
     {
+        reloadConfig();
         logger.info("Registering Commands...");
-        CommandBus.newInstance(logger).register(mountCommands()).submit(this);
+        CommandBus.newInstance(logger).register(new MountCommands(this)).submit(this);
     }
 
     @Listener
@@ -103,20 +100,12 @@ public class MountsPlugin
         }
     }
 
-    private MountCommands mountCommands()
+    public Config config()
     {
-        Path commandsPath = configDir.resolve("commands.cfg");
-        Optional<MountCommands> optional = fromHocon(commandsPath, MountCommands.class);
-        if (optional.isPresent())
-        {
-            return optional.get().setPath(commandsPath);
-        }
-        MountCommands commands = new MountCommands().setPath(commandsPath);
-        toHocon(commands, commandsPath);
-        return commands;
+        return config;
     }
 
-    public static void clearMounts()
+    public void clearMounts()
     {
         Sponge.getServer().getWorlds()
                 .forEach(w -> w.getEntities(e -> {
@@ -125,53 +114,14 @@ public class MountsPlugin
                 }).forEach(Entity::remove));
     }
 
-    public static <T> Optional<T> fromHocon(Path path, Class<T> type)
+    public void reloadConfig()
     {
-        if (!Files.exists(path))
+        Optional<Config> optional = configLoader.fromHocon(configPath, Config.class);
+        if (optional.isPresent())
         {
-            return Optional.empty();
+            this.config = optional.get();
+            return;
         }
-        return from(HoconConfigurationLoader.builder().setPath(path).build(), type);
-    }
-
-    public static <T> boolean toHocon(T object, Path path)
-    {
-
-        return to(HoconConfigurationLoader.builder().setPath(path).build(), path, object);
-    }
-
-    private static <T> Optional<T> from(AbstractConfigurationLoader<?> loader, Class<T> type)
-    {
-        try
-        {
-            ConfigurationNode node = loader.load();
-            T t = ObjectMapper.forClass(type).bindToNew().populate(node);
-            if (t != null)
-            {
-                return Optional.of(t);
-            }
-        }
-        catch (IOException | ObjectMappingException e)
-        {
-            e.printStackTrace();
-        }
-        return Optional.empty();
-    }
-
-    private static <T> boolean to(AbstractConfigurationLoader<?> loader, Path path, T object)
-    {
-        try
-        {
-            Files.createDirectories(path.getParent());
-            ConfigurationNode node = loader.createEmptyNode();
-            ObjectMapper.forObject(object).populate(node);
-            loader.save(node);
-            return true;
-        }
-        catch (IOException | ObjectMappingException e)
-        {
-            e.printStackTrace();
-        }
-        return false;
+        configLoader.toHocon(this.config = new Config(), configPath);
     }
 }

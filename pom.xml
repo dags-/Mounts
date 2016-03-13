@@ -74,6 +74,12 @@
             <artifactId>CommandBus</artifactId>
             <version>3554423</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.github.dags-</groupId>
+            <artifactId>DaLib</artifactId>
+            <version>a3374cf</version>
+        </dependency>
     </dependencies>
     
 </project>
