@@ -43,7 +43,6 @@ import java.util.Optional;
  * @author dags <dags@dags.me>
  */
 
-@ConfigSerializable
 public class MountCommands
 {
     private final MountsPlugin plugin;
