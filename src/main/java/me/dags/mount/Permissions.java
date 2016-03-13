@@ -38,6 +38,8 @@ public class Permissions
     public static final String COMMAND_ITEM = "mounts.command.item";
     public static final String COMMAND_PURGE = "mounts.command.purge";
     public static final String COMMAND_RELOAD = "mounts.command.reload";
+    public static final String COMMAND_REMOVE_SELF = "mounts.command.remove.self";
+    public static final String COMMAND_REMOVE_OTHER = "mounts.command.remove.other";
     public static final String COMMAND_SPEED = "mounts.command.speed";
     public static final String COMMAND_TYPE = "mounts.command.type";
 

@@ -70,13 +70,7 @@ public class MountCommands
     }
 
     @Command(aliases = {"create", "c"}, parent = "mount", perm = Permissions.COMMAND_CREATE)
-    public void create0(@Caller Player player)
-    {
-        create1(player, "pig");
-    }
-
-    @Command(aliases = {"create", "c"}, parent = "mount", perm = Permissions.COMMAND_CREATE)
-    public void create1(@Caller Player player, @One("entity") String type)
+    public void create(@Caller Player player)
     {
         if (!player.get(PlayerMountDataMutable.class).isPresent())
         {
@@ -84,10 +78,43 @@ public class MountCommands
         }
 
         PlayerMountDataMutable data = new PlayerMountDataMutable();
-        if (setType(player, data, type))
+        data.setEntityType(plugin.config().defaultMount.entityType);
+        data.setItemType(plugin.config().defaultMount.itemType);
+        data.set(MountKeys.CAN_FLY, plugin.config().defaultMount.canFly);
+        data.set(MountKeys.INVINCIBLE, plugin.config().defaultMount.invincible);
+        data.set(MountKeys.MOVE_SPEED, plugin.config().defaultMount.moveSpeed);
+        data.set(MountKeys.LEASH_SPEED, plugin.config().defaultMount.leashSpeed);
+        player.offer(data);
+
+        messenger().info("Successfully created your new mount!").tell(player);
+    }
+
+    @Command(aliases = {"remove", "r", "delete", "d"}, parent = "mount", perm = Permissions.COMMAND_REMOVE_SELF)
+    public void removeSelf(@Caller Player player)
+    {
+        if (!player.get(PlayerMountDataMutable.class).isPresent())
         {
-            messenger().info("Successfully created your new mount!").tell(player);
+            messenger().error("You do not have a mount to remove!").tell(player);
+            return;
         }
+
+        player.remove(PlayerMountDataMutable.class);
+        messenger().info("Removed your mount!").tell(player);
+    }
+
+    // FIXME: 13/03/2016
+    //@Command(aliases = {"other", "o"}, parent = "mount remove", perm = Permissions.COMMAND_REMOVE_OTHER)
+    public void removeOther(@Caller Player player, @One Player target)
+    {
+        if (!target.get(PlayerMountDataMutable.class).isPresent())
+        {
+            messenger().stress(target.getName()).error(" does not have a mount to remove!").tell(player);
+            return;
+        }
+
+        target.remove(PlayerMountDataMutable.class);
+        messenger().stress(player.getName()).info(" removed your mount!").tell(target);
+        messenger().info("You removed ").stress(target.getName()).info("'s mount!").tell(target);
     }
 
     @Command(aliases = {"type", "t"}, parent = "mount", perm = Permissions.COMMAND_TYPE)

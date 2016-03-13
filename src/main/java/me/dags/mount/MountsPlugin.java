@@ -117,11 +117,7 @@ public class MountsPlugin
     public void reloadConfig()
     {
         Optional<Config> optional = configLoader.fromHocon(configPath, Config.class);
-        if (optional.isPresent())
-        {
-            this.config = optional.get();
-            return;
-        }
-        configLoader.toHocon(this.config = new Config(), configPath);
+        config = optional.isPresent() ? optional.get() : new Config();
+        configLoader.toHocon(config, configPath);
     }
 }

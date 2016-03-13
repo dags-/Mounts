@@ -39,6 +39,25 @@ public class Config
     protected MountSpeeds mountSpeeds = new MountSpeeds();
     @Setting (value = "command_colors", comment = "Set command message colors")
     protected CommandMessenger commandMessenger = new CommandMessenger();
+    @Setting (value = "default_mount", comment = "Configure the default Mount for users")
+    protected DefaultMount defaultMount = new DefaultMount();
+
+    @ConfigSerializable
+    public static class DefaultMount
+    {
+        @Setting
+        protected String entityType = "PIG";
+        @Setting
+        protected String itemType = "SADDLE";
+        @Setting
+        protected boolean canFly = false;
+        @Setting
+        protected boolean invincible = false;
+        @Setting
+        protected double moveSpeed = 0.25D;
+        @Setting
+        protected double leashSpeed = 0.05D;
+    }
 
     @ConfigSerializable
     public static class MountSpeeds
