@@ -77,7 +77,7 @@ public class MountsPlugin
     {
         reloadConfig();
         logger.info("Registering Commands...");
-        CommandBus.newInstance(logger).register(new MountCommands(this)).submit(this);
+        CommandBus.newSilentInstance().register(new MountCommands(this)).submit(this);
     }
 
     @Listener
