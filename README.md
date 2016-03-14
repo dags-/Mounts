@@ -5,16 +5,14 @@ Mounts is a Sponge plugin that allows players to create personal, rideable mount
 
 ![squid](https://raw.githubusercontent.com/dags-/Mounts/img/resource/squid.gif)
 
-Usage
-====
+## Usage
 Once a mount has been created using the `/mount create` command, the user can spawn and ride this mount by right-clicking with a saddle (customisable) in their hand. The mount is immediately removed from the world when it is dismounted (by sneaking).
 
 Mounts will automatically move in the direction that the player is looking (including flying up/down if enabled).
 
 Mounts can travel at two different speeds, one when holding a leash item, and one with any other (or no) item in hand (both speeds are configurable). Global minumum and maximum speeds can be set in the config file.
 
-Commands
-====
+## Commands
 - `/mount create` - create a new mount
 - `/mount remove` - delete your mount
 - `/mount type <entity_type>` - set your mount to the given entity type
@@ -28,8 +26,7 @@ Commands
 
 _Entity names are as defined by SpongeAPI, and generally single, no-spaces words_
 
-Permissions
-====
+## Permissions
 - `mounts.command.create` - allows use of the `/mount create` command
 - `mounts.command.remove.self` - allows use of the `/mount remove` command
 - `mounts.command.fly` - allows use of the `/mount fly` command
@@ -42,8 +39,7 @@ Permissions
 - `mounts.use` - allows user to right-click their mount item in order to spawn it
 - `mounts.type.<entity_type>` - allows user to set their mount to a specific entity type
 
-Notes
-====
+## Notes
 - **If the server does not shut down correctly, some mount entities may persist in the world after it starts again**
 - **Flying around quickly may put stress on the server's hardware as it has to load chunks more quickly than usual**
 - User experience may vary depending on latency
