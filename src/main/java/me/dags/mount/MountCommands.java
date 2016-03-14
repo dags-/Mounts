@@ -141,7 +141,7 @@ public class MountCommands
         setItem(player, (d, i) -> d.setSpawnItem(i.getName()));
     }
 
-    @Command(aliases = {"leash", "l"}, parent = "mount", perm = Permissions.COMMAND_LEASH)
+    @Command(aliases = {"leash", "lead", "l"}, parent = "mount", perm = Permissions.COMMAND_LEASH)
     public void leash(@Caller Player player)
     {
         setItem(player, (d, i) -> d.setLeashItem(i.getName()));

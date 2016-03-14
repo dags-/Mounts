@@ -54,7 +54,7 @@ import java.util.Optional;
  * @author dags <dags@dags.me>
  */
 
-@Plugin(name = "Mounts", id = "dags.mounts", version = "1.0.0", description = "Turn mobs into mounts!", authors = "dags", url = "https://github.com/dags-/Mounts")
+@Plugin(name = "Mounts", id = "mounts", version = "1.0.0", description = "Turn mobs into mounts!", authors = "dags", url = "https://github.com/dags-/Mounts")
 public class MountsPlugin
 {
     @Inject
