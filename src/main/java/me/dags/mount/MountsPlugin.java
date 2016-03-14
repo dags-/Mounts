@@ -83,7 +83,7 @@ public class MountsPlugin
     @Listener
     public void serverStop(GameStoppingServerEvent event)
     {
-        logger.info("Clearing Mounts before server stop...");
+        logger.info("Clearing Mounts...");
         clearMounts();
     }
 

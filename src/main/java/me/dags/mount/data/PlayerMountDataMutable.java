@@ -72,7 +72,7 @@ public class PlayerMountDataMutable extends AbstractData<PlayerMountDataMutable,
 
     public ItemType itemType()
     {
-        return common.itemType;
+        return common.spawnItem;
     }
 
     public boolean setEntityType(String type)
@@ -87,13 +87,25 @@ public class PlayerMountDataMutable extends AbstractData<PlayerMountDataMutable,
         return false;
     }
 
-    public boolean setItemType(String type)
+    public boolean setSpawnItem(String type)
     {
         Optional<ItemType> itemType = Sponge.getRegistry().getType(ItemType.class, type);
         if (itemType.isPresent())
         {
-            this.set(MountKeys.ITEM, type);
-            this.common.setItemType(itemType.get());
+            this.set(MountKeys.SPAWN_ITEM, type);
+            this.common.setSpawnItem(itemType.get());
+            return true;
+        }
+        return false;
+    }
+
+    public boolean setLeashItem(String type)
+    {
+        Optional<ItemType> itemType = Sponge.getRegistry().getType(ItemType.class, type);
+        if (itemType.isPresent())
+        {
+            this.set(MountKeys.LEASH_ITEM, type);
+            this.common.setLeashItem(itemType.get());
             return true;
         }
         return false;
@@ -103,21 +115,24 @@ public class PlayerMountDataMutable extends AbstractData<PlayerMountDataMutable,
     protected void registerGettersAndSetters()
     {
         registerFieldGetter(MountKeys.TYPE, () -> this.common.type);
-        registerFieldGetter(MountKeys.ITEM, () -> this.common.item);
+        registerFieldGetter(MountKeys.SPAWN_ITEM, () -> this.common.item);
+        registerFieldGetter(MountKeys.LEASH_ITEM, () -> this.common.leash);
         registerFieldGetter(MountKeys.CAN_FLY, () -> this.common.canFly);
         registerFieldGetter(MountKeys.INVINCIBLE, () -> this.common.invincible);
         registerFieldGetter(MountKeys.MOVE_SPEED, () -> this.common.moveSpeed);
         registerFieldGetter(MountKeys.LEASH_SPEED, () -> this.common.leashSpeed);
 
         registerFieldSetter(MountKeys.TYPE, e -> this.common.type = e);
-        registerFieldSetter(MountKeys.ITEM, r -> this.common.item = r);
+        registerFieldSetter(MountKeys.SPAWN_ITEM, r -> this.common.item = r);
+        registerFieldSetter(MountKeys.LEASH_ITEM, r -> this.common.leash = r);
         registerFieldSetter(MountKeys.CAN_FLY, f -> this.common.canFly = f);
         registerFieldSetter(MountKeys.INVINCIBLE, i -> this.common.invincible = i);
         registerFieldSetter(MountKeys.MOVE_SPEED, s -> this.common.moveSpeed = s);
         registerFieldSetter(MountKeys.LEASH_SPEED, s -> this.common.leashSpeed = s);
 
         registerKeyValue(MountKeys.TYPE, common::type);
-        registerKeyValue(MountKeys.ITEM, common::item);
+        registerKeyValue(MountKeys.SPAWN_ITEM, common::spawnItem);
+        registerKeyValue(MountKeys.LEASH_ITEM, common::leashItem);
         registerKeyValue(MountKeys.CAN_FLY, common::fly);
         registerKeyValue(MountKeys.INVINCIBLE, common::invincible);
         registerKeyValue(MountKeys.MOVE_SPEED, common::moveSpeed);

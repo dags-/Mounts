@@ -36,6 +36,7 @@ public class Permissions
     public static final String COMMAND_FLY = "mounts.command.fly";
     public static final String COMMAND_INVINCIBLE = "mounts.command.invincible";
     public static final String COMMAND_ITEM = "mounts.command.item";
+    public static final String COMMAND_LEASH = "mounts.command.leash";
     public static final String COMMAND_PURGE = "mounts.command.purge";
     public static final String COMMAND_RELOAD = "mounts.command.reload";
     public static final String COMMAND_REMOVE_SELF = "mounts.command.remove.self";

@@ -54,14 +54,16 @@ public class PlayerMountDataImmutable extends AbstractImmutableData<PlayerMountD
     protected void registerGetters()
     {
         registerFieldGetter(MountKeys.TYPE, () -> this.common.type);
-        registerFieldGetter(MountKeys.ITEM, () -> this.common.item);
+        registerFieldGetter(MountKeys.SPAWN_ITEM, () -> this.common.item);
+        registerFieldGetter(MountKeys.LEASH_ITEM, () -> this.common.leash);
         registerFieldGetter(MountKeys.CAN_FLY, () -> this.common.canFly);
         registerFieldGetter(MountKeys.INVINCIBLE, () -> this.common.invincible);
         registerFieldGetter(MountKeys.MOVE_SPEED, () -> this.common.moveSpeed);
         registerFieldGetter(MountKeys.LEASH_SPEED, () -> this.common.leashSpeed);
 
         registerKeyValue(MountKeys.TYPE, () -> common.type().asImmutable());
-        registerKeyValue(MountKeys.ITEM, () -> common.item().asImmutable());
+        registerKeyValue(MountKeys.SPAWN_ITEM, () -> common.spawnItem().asImmutable());
+        registerKeyValue(MountKeys.LEASH_ITEM, () -> common.leashItem().asImmutable());
         registerKeyValue(MountKeys.CAN_FLY, () -> common.fly().asImmutable());
         registerKeyValue(MountKeys.INVINCIBLE, () -> common.invincible().asImmutable());
         registerKeyValue(MountKeys.MOVE_SPEED, () -> common.moveSpeed().asImmutable());

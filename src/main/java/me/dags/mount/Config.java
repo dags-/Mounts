@@ -48,7 +48,9 @@ public class Config
         @Setting
         protected String entityType = "PIG";
         @Setting
-        protected String itemType = "SADDLE";
+        protected String spawnItem = "SADDLE";
+        @Setting
+        protected String leashItem = "LEAD";
         @Setting
         protected boolean canFly = false;
         @Setting

@@ -33,9 +33,11 @@ import me.dags.mount.data.PlayerMountDataMutable;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 /**
  * @author dags <dags@dags.me>
@@ -79,7 +81,8 @@ public class MountCommands
 
         PlayerMountDataMutable data = new PlayerMountDataMutable();
         data.setEntityType(plugin.config().defaultMount.entityType);
-        data.setItemType(plugin.config().defaultMount.itemType);
+        data.setSpawnItem(plugin.config().defaultMount.spawnItem);
+        data.setLeashItem(plugin.config().defaultMount.leashItem);
         data.set(MountKeys.CAN_FLY, plugin.config().defaultMount.canFly);
         data.set(MountKeys.INVINCIBLE, plugin.config().defaultMount.invincible);
         data.set(MountKeys.MOVE_SPEED, plugin.config().defaultMount.moveSpeed);
@@ -135,24 +138,13 @@ public class MountCommands
     @Command(aliases = {"item", "i"}, parent = "mount", perm = Permissions.COMMAND_ITEM)
     public void item(@Caller Player player)
     {
-        Optional<PlayerMountDataMutable> optional = player.get(PlayerMountDataMutable.class);
-        if (optional.isPresent())
-        {
-            Optional<ItemStack> inHand = player.getItemInHand();
-            if (inHand.isPresent())
-            {
-                String item = inHand.get().getItem().getName();
-                if (optional.get().setItemType(item))
-                {
-                    player.offer(optional.get());
-                    messenger().info("You have set your mount's item to: ").stress(item).tell(player);
-                }
-                return;
-            }
-            messenger().error("You must be holding an item to use this command!").tell(player);
-            return;
-        }
-        messenger().error("You must first create a mount before your can change its properties!").tell(player);
+        setItem(player, (d, i) -> d.setSpawnItem(i.getName()));
+    }
+
+    @Command(aliases = {"leash", "l"}, parent = "mount", perm = Permissions.COMMAND_LEASH)
+    public void leash(@Caller Player player)
+    {
+        setItem(player, (d, i) -> d.setLeashItem(i.getName()));
     }
 
     @Command(aliases = {"normal", "n"}, parent = "mount speed", perm = Permissions.COMMAND_SPEED)
@@ -216,6 +208,28 @@ public class MountCommands
         }
         messenger().error("You must first create a mount before your can change its properties!").tell(player);
         return false;
+    }
+
+    private void setItem(Player player, BiFunction<PlayerMountDataMutable, ItemType, Boolean> operation)
+    {
+        Optional<PlayerMountDataMutable> optional = player.get(PlayerMountDataMutable.class);
+        if (optional.isPresent())
+        {
+            Optional<ItemStack> inHand = player.getItemInHand();
+            if (inHand.isPresent())
+            {
+                String item = inHand.get().getItem().getName();
+                if (operation.apply(optional.get(), inHand.get().getItem()))
+                {
+                    player.offer(optional.get());
+                    messenger().info("Item set to: ").stress(item).tell(player);
+                }
+                return;
+            }
+            messenger().error("You must be holding an item to use this command!").tell(player);
+            return;
+        }
+        messenger().error("You must first create a mount before your can change its properties!").tell(player);
     }
 
     private <T> boolean set(Player player, Key<Value<T>> key, T value)

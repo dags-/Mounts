@@ -43,7 +43,6 @@ import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
@@ -58,6 +57,10 @@ import java.util.function.Consumer;
 
 public class Mount implements Consumer<Task>
 {
+    private static final Handler FLYING_ENTITY = flyingEntity();
+    private static final Handler FLYING_DRAGON = flyingDragon();
+    private static final Handler GROUND_ENTITY = groundEntity();
+
     private final Player player;
     private final Living vehicle;
     private final PlayerMountDataCommon mountData;
@@ -104,6 +107,7 @@ public class Mount implements Consumer<Task>
         if (task.isPresent())
         {
             task.get().cancel();
+            task = Optional.empty();
         }
     }
 
@@ -156,6 +160,12 @@ public class Mount implements Consumer<Task>
         movementHandler.move(this);
     }
 
+    private double currentSpeed()
+    {
+        Optional<ItemStack> inHand = player.getItemInHand();
+        return inHand.isPresent() && inHand.get().getItem() == mountData.getLeashItem() ? mountData.getLeashSpeed() : mountData.getMoveSpeed();
+    }
+
     private interface Handler
     {
         void move(Mount mount);
@@ -163,14 +173,13 @@ public class Mount implements Consumer<Task>
 
     private static Handler getHandler(EntityType type, boolean canFly)
     {
-        return type == EntityTypes.ENDER_DRAGON ? flyingDragon() : canFly ? flyingEntity() : other();
+        return type == EntityTypes.ENDER_DRAGON ? FLYING_DRAGON : canFly ? FLYING_ENTITY : GROUND_ENTITY;
     }
 
     private static Handler flyingEntity()
     {
         return mount -> {
-            Optional<ItemStack> inHand = mount.player.getItemInHand();
-            double speed = inHand.isPresent() && inHand.get().getItem() == ItemTypes.LEAD ? mount.mountData.getLeashSpeed() : mount.mountData.getMoveSpeed();
+            double speed = mount.currentSpeed();
             Vector3d rotation = mount.player.getHeadRotation();
             Vector3d velocity = rotationToVelocity(rotation, speed, speed);
             mount.vehicle.setVelocity(velocity);
@@ -182,8 +191,7 @@ public class Mount implements Consumer<Task>
     private static Handler flyingDragon()
     {
         return mount -> {
-            Optional<ItemStack> inHand = mount.player.getItemInHand();
-            double speed = inHand.isPresent() && inHand.get().getItem() == ItemTypes.LEAD ? mount.mountData.getLeashSpeed() : mount.mountData.getMoveSpeed();
+            double speed = mount.currentSpeed();
             Vector3d rotation = mount.player.getRotation();
             Vector3d velocity = rotationToVelocity(rotation, speed, speed);
             mount.vehicle.setVelocity(velocity);
@@ -191,12 +199,10 @@ public class Mount implements Consumer<Task>
         };
     }
 
-    private static Handler other()
+    private static Handler groundEntity()
     {
         return mount -> {
-            Optional<ItemStack> inHand = mount.player.getItemInHand();
-            double speed = inHand.isPresent() && inHand.get().getItem() == ItemTypes.LEAD ? mount.mountData.getLeashSpeed() : mount.mountData.getMoveSpeed();
-
+            double speed = mount.currentSpeed();
             Vector3d rotation = mount.player.getHeadRotation();
             Vector3d velocity = rotationToVelocity(mount.player.getRotation(), speed, 0).add(0, mount.vehicle.getVelocity().getY(), 0);
             Vector3d ahead = direction(rotation).mul(1, 0, 1);

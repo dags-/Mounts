@@ -46,13 +46,15 @@ public class PlayerMountDataCommon
 
     protected String type = EntityTypes.PIG.getName();
     protected String item = ItemTypes.SADDLE.getName();
+    protected String leash = ItemTypes.LEAD.getName();
     protected boolean canFly = true;
     protected boolean invincible = true;
     protected double moveSpeed = 0.25D;
     protected double leashSpeed = 0.05D;
 
     protected transient EntityType entityType = EntityTypes.PIG;
-    protected transient ItemType itemType = ItemTypes.SADDLE;
+    protected transient ItemType spawnItem = ItemTypes.SADDLE;
+    protected transient ItemType leashItem = ItemTypes.LEAD;
 
     protected PlayerMountDataCommon()
     {}
@@ -61,18 +63,20 @@ public class PlayerMountDataCommon
     {
         this.type = info.type;
         this.item = info.item;
+        this.leash = info.leash;
         this.canFly = info.canFly;
         this.invincible = info.invincible;
         this.moveSpeed = info.moveSpeed;
         this.leashSpeed = info.leashSpeed;
         this.entityType = info.entityType;
-        this.itemType = info.itemType;
+        this.spawnItem = info.spawnItem;
+        this.leashItem = info.leashItem;
     }
 
     public PlayerMountDataCommon set(DataView dataContainer)
     {
         this.type = dataContainer.getString(MountKeys.TYPE.getQuery()).get();
-        this.item = dataContainer.getString(MountKeys.ITEM.getQuery()).get();
+        this.item = dataContainer.getString(MountKeys.SPAWN_ITEM.getQuery()).get();
         this.canFly = dataContainer.getBoolean(MountKeys.CAN_FLY.getQuery()).get();
         this.invincible = dataContainer.getBoolean(MountKeys.INVINCIBLE.getQuery()).get();
         this.moveSpeed = dataContainer.getDouble(MountKeys.MOVE_SPEED.getQuery()).get();
@@ -80,7 +84,7 @@ public class PlayerMountDataCommon
         Optional<EntityType> t = Sponge.getRegistry().getType(EntityType.class, this.type);
         Optional<ItemType> i = Sponge.getRegistry().getType(ItemType.class, this.item);
         this.entityType = t.isPresent() ? t.get() : entityType;
-        this.itemType = i.isPresent() ? i.get() : itemType;
+        this.spawnItem = i.isPresent() ? i.get() : spawnItem;
         return this;
     }
 
@@ -109,9 +113,24 @@ public class PlayerMountDataCommon
         this.entityType = type;
     }
 
-    public void setItemType(ItemType type)
+    public void setSpawnItem(ItemType type)
     {
-        this.itemType = type;
+        this.spawnItem = type;
+    }
+
+    public void setLeashItem(ItemType type)
+    {
+        this.leashItem = type;
+    }
+
+    public ItemType getSpawnItem()
+    {
+        return spawnItem;
+    }
+
+    public ItemType getLeashItem()
+    {
+        return leashItem;
     }
 
     public Value<String> type()
@@ -119,9 +138,14 @@ public class PlayerMountDataCommon
         return Sponge.getRegistry().getValueFactory().createValue(MountKeys.TYPE, "pig", type);
     }
 
-    public Value<String> item()
+    public Value<String> spawnItem()
     {
-        return Sponge.getRegistry().getValueFactory().createValue(MountKeys.ITEM, "lead", item);
+        return Sponge.getRegistry().getValueFactory().createValue(MountKeys.SPAWN_ITEM, "saddle", item);
+    }
+
+    public Value<String> leashItem()
+    {
+        return Sponge.getRegistry().getValueFactory().createValue(MountKeys.LEASH_ITEM, "lead", leash);
     }
 
     public Value<Boolean> fly()
@@ -147,7 +171,8 @@ public class PlayerMountDataCommon
     public DataContainer toContainer() {
         return new MemoryDataContainer()
                 .set(MountKeys.TYPE, type)
-                .set(MountKeys.ITEM, item)
+                .set(MountKeys.SPAWN_ITEM, item)
+                .set(MountKeys.LEASH_ITEM, leash)
                 .set(MountKeys.CAN_FLY, canFly)
                 .set(MountKeys.INVINCIBLE, invincible)
                 .set(MountKeys.MOVE_SPEED, moveSpeed)
@@ -158,7 +183,8 @@ public class PlayerMountDataCommon
     {
         if (!dataContainer.contains(
                 MountKeys.TYPE.getQuery(),
-                MountKeys.ITEM.getQuery(),
+                MountKeys.SPAWN_ITEM.getQuery(),
+                MountKeys.LEASH_ITEM.getQuery(),
                 MountKeys.CAN_FLY.getQuery(),
                 MountKeys.INVINCIBLE.getQuery(),
                 MountKeys.MOVE_SPEED.getQuery(),

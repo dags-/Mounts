@@ -36,7 +36,8 @@ import org.spongepowered.api.data.value.mutable.Value;
 public class MountKeys
 {
     public static final Key<Value<String>> TYPE = single(String.class, "ENTITY_TYPE");
-    public static final Key<Value<String>> ITEM = single(String.class, "SPAWN_ITEM");
+    public static final Key<Value<String>> SPAWN_ITEM = single(String.class, "SPAWN_ITEM");
+    public static final Key<Value<String>> LEASH_ITEM = single(String.class, "LEASH_ITEM");
     public static final Key<Value<Boolean>> CAN_FLY = single(Boolean.class, "CAN_FLY");
     public static final Key<Value<Boolean>> INVINCIBLE = single(Boolean.class, "INVINCIBLE");
     public static final Key<Value<Double>> MOVE_SPEED = single(Double.class, "MOVE_SPEED");
