@@ -60,6 +60,7 @@ public class Mount implements Consumer<Task>
     private static final Handler FLYING_ENTITY = flyingEntity();
     private static final Handler FLYING_DRAGON = flyingDragon();
     private static final Handler GROUND_ENTITY = groundEntity();
+    private static final SpawnCause PLUGIN_SPAWN = SpawnCause.builder().type(SpawnTypes.PLUGIN).build();
 
     private final Player player;
     private final Living vehicle;
@@ -78,11 +79,7 @@ public class Mount implements Consumer<Task>
 
     public void mountPlayer(Object plugin)
     {
-        Cause cause = Cause.source(SpawnCause.builder()
-                .type(SpawnTypes.PLUGIN).build())
-                .named(NamedCause.simulated(player)).build();
-
-        if (player.getWorld().spawnEntity(vehicle, cause))
+        if (player.getWorld().spawnEntity(vehicle, Cause.source(PLUGIN_SPAWN).named(NamedCause.simulated(player)).build()))
         {
             vehicle.offer(Keys.DISPLAY_NAME, Text.of(player.getName() + "'s Epic Mount!"));
             Sponge.getScheduler().createTaskBuilder()
