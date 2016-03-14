@@ -17,6 +17,7 @@ Mounts can travel at two different speeds, one when holding a leash item, and on
 - `/mount remove` - delete your mount
 - `/mount type <entity_type>` - set your mount to the given entity type
 - `/mount item` - set the item type you must be holding to spawn your mount
+- `/mount leash` - set the item type you must be holding to activate your mount's secondary speed
 - `/mount fly` - toggle whether or not your mount can fly (certain flying mounts will fly regardless)
 - `/mount invincible` - toggle whether or not your mount can take damge (including fall damage)
 - `/mount speed normal <number>` - set the normal movement speed of your mount
@@ -32,6 +33,7 @@ _Entity names are as defined by SpongeAPI, and generally single, no-spaces words
 - `mounts.command.fly` - allows use of the `/mount fly` command
 - `mounts.command.invincible` - allows use of the `/mount invincible` command
 - `mounts.command.item` - allows use of the `/mount item` command
+- `mounts.command.leash` - allows use of the `/mount leash` command
 - `mounts.command.purge` - allows use of the `/mount purge` command
 - `mounts.command.reload` - allows use of the `/mount reload` command
 - `mounts.command.speed` - allows use of the `/mount speed` command
@@ -44,3 +46,4 @@ _Entity names are as defined by SpongeAPI, and generally single, no-spaces words
 - **Flying around quickly may put stress on the server's hardware as it has to load chunks more quickly than usual**
 - User experience may vary depending on latency
 - Aggressive mounts may still try to attack you in Survival/Adventure mode
+- The player's riding position may not always be perfectly on the mounts back
