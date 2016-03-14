@@ -3,7 +3,7 @@ Mounts is a Sponge plugin that allows players to create personal, rideable mount
 
 [![Build Status](https://travis-ci.org/dags-/Mounts.svg?branch=master)](https://travis-ci.org/dags-/Mounts)
 
-![squid](https://raw.githubusercontent.com/dags-/Mounts/img/resource/squid.gif)
+![squid](https://raw.githubusercontent.com/dags-/Mounts/img/flyingsquid.gif)
 
 ## Usage
 Once a mount has been created using the `/mount create` command, the user can spawn and ride this mount by right-clicking with a saddle (customisable) in their hand. The mount is immediately removed from the world when it is dismounted (by sneaking).
