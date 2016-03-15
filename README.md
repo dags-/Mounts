@@ -15,7 +15,7 @@ Mounts can travel at two different speeds, one whilst holding a 'leash', and one
 
 See `/help mount` for a full list of commands that can be used to customise your mount. 
 
-## Configuartion
+## Configuration
 The `mounts.conf` file should be fairly self-explanatory.  
 There are 3 main sections:
 - `command_colors` - configure the colors of `/mount` command messages
