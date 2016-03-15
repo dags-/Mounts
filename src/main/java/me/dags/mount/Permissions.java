@@ -39,10 +39,11 @@ public class Permissions
     public static final String COMMAND_LEASH = "mounts.command.leash";
     public static final String COMMAND_PURGE = "mounts.command.purge";
     public static final String COMMAND_RELOAD = "mounts.command.reload";
-    public static final String COMMAND_REMOVE_SELF = "mounts.command.remove.self";
-    public static final String COMMAND_REMOVE_OTHER = "mounts.command.remove.other";
+    public static final String COMMAND_RESET_SELF = "mounts.command.reset.self";
+    public static final String COMMAND_RESET_OTHER = "mounts.command.reset.other";
     public static final String COMMAND_SPEED = "mounts.command.speed";
     public static final String COMMAND_TYPE = "mounts.command.type";
+    public static final String COMMAND_TYPES = "mounts.command.types";
 
     public static final String MOUNT_USE = "mounts.use";
 

@@ -22,12 +22,15 @@
  * THE SOFTWARE.
  */
 
-package me.dags.mount.data;
+package me.dags.mount.data.player;
 
+import me.dags.mount.Config;
+import me.dags.mount.data.MountKeys;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.data.Queries;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
@@ -47,6 +50,9 @@ public class PlayerMountDataCommon
     protected String type = EntityTypes.PIG.getName();
     protected String item = ItemTypes.SADDLE.getName();
     protected String leash = ItemTypes.LEAD.getName();
+    // TODO
+    protected String name = "Dennis";
+
     protected boolean canFly = true;
     protected boolean invincible = true;
     protected double moveSpeed = 0.25D;
@@ -86,6 +92,12 @@ public class PlayerMountDataCommon
         this.entityType = t.isPresent() ? t.get() : entityType;
         this.spawnItem = i.isPresent() ? i.get() : spawnItem;
         return this;
+    }
+
+    public void clampSpeeds(Config.MountSpeeds speeds)
+    {
+        moveSpeed = speeds.clamp(moveSpeed);
+        leashSpeed = speeds.clamp(leashSpeed);
     }
 
     public boolean canFly()
@@ -168,8 +180,10 @@ public class PlayerMountDataCommon
         return Sponge.getRegistry().getValueFactory().createValue(MountKeys.LEASH_SPEED, 0.1D, leashSpeed);
     }
 
-    public DataContainer toContainer() {
+    public DataContainer toContainer()
+    {
         return new MemoryDataContainer()
+                .set(Queries.CONTENT_VERSION, DATA_VERSION)
                 .set(MountKeys.TYPE, type)
                 .set(MountKeys.SPAWN_ITEM, item)
                 .set(MountKeys.LEASH_ITEM, leash)

@@ -22,13 +22,17 @@
  * THE SOFTWARE.
  */
 
-package me.dags.mount.data;
+package me.dags.mount.data.player;
 
 import com.flowpowered.math.vector.Vector3d;
 import me.dags.mount.Mount;
+import me.dags.mount.data.MountKeys;
+import me.dags.mount.data.mount.MountDataMutable;
+
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.common.AbstractData;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.entity.Entity;
@@ -36,6 +40,7 @@ import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -65,7 +70,10 @@ public class PlayerMountDataMutable extends AbstractData<PlayerMountDataMutable,
         Optional<Living> optional = create(common.entityType, Living.class, player.getLocation());
         if (optional.isPresent())
         {
-            return Optional.of(new Mount(player, optional.get(), common));
+            Living entity = optional.get();
+            entity.offer(new MountDataMutable());
+            entity.offer(Keys.DISPLAY_NAME, Text.of(common.name));
+            return Optional.of(new Mount(player, entity, common));
         }
         return Optional.empty();
     }

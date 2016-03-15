@@ -36,29 +36,79 @@ import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 public class Config
 {
     @Setting (value = "speed_limits", comment = "Set the allowed range of speeds for Mounts")
-    protected MountSpeeds mountSpeeds = new MountSpeeds();
+    private MountSpeeds mountSpeeds = new MountSpeeds();
     @Setting (value = "command_colors", comment = "Set command message colors")
-    protected CommandMessenger commandMessenger = new CommandMessenger();
+    private CommandMessenger commandMessenger = new CommandMessenger();
     @Setting (value = "default_mount", comment = "Configure the default Mount for users")
-    protected DefaultMount defaultMount = new DefaultMount();
+    private DefaultMount defaultMount = new DefaultMount();
+
+    public MountSpeeds speeds()
+    {
+        return mountSpeeds;
+    }
+
+    public CommandMessenger messenger()
+    {
+        return commandMessenger;
+    }
+
+    public DefaultMount defaults()
+    {
+        return defaultMount;
+    }
 
     @ConfigSerializable
     public static class DefaultMount
     {
         @Setting
-        protected String entityType = "PIG";
+        private String entityType = "PIG";
         @Setting
-        protected String spawnItem = "SADDLE";
+        private String spawnItem = "SADDLE";
         @Setting
-        protected String leashItem = "LEAD";
+        private String leashItem = "LEAD";
         @Setting
-        protected boolean canFly = false;
+        private boolean canFly = false;
         @Setting
-        protected boolean invincible = false;
+        private boolean invincible = false;
         @Setting
-        protected double moveSpeed = 0.25D;
+        private double normalSpeed = 0.25D;
         @Setting
-        protected double leashSpeed = 0.05D;
+        private double leashSpeed = 0.05D;
+
+        public String type()
+        {
+            return entityType;
+        }
+
+        public String spawnItem()
+        {
+            return spawnItem;
+        }
+
+        public String leashItem()
+        {
+            return leashItem;
+        }
+
+        public boolean canFly()
+        {
+            return canFly;
+        }
+
+        public boolean invincible()
+        {
+            return invincible;
+        }
+
+        public double normalSpeed()
+        {
+            return normalSpeed;
+        }
+
+        public double leashSpeed()
+        {
+            return leashSpeed;
+        }
     }
 
     @ConfigSerializable
@@ -69,14 +119,19 @@ public class Config
         @Setting
         protected double maxSpeed = 5.0D;
 
-        protected boolean outsideOfRange(double test)
+        public boolean outsideOfRange(double test)
         {
             return test < minSpeed || test > maxSpeed;
         }
 
-        protected String getRange()
+        public String getRange()
         {
             return minSpeed + " < x < " + maxSpeed;
+        }
+
+        public double clamp(double speedIn)
+        {
+            return speedIn < minSpeed ? minSpeed : speedIn > maxSpeed ? maxSpeed : speedIn;
         }
     }
 }

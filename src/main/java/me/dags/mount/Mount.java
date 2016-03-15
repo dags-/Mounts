@@ -26,7 +26,7 @@ package me.dags.mount;
 
 import com.flowpowered.math.imaginary.Quaterniond;
 import com.flowpowered.math.vector.Vector3d;
-import me.dags.mount.data.PlayerMountDataCommon;
+import me.dags.mount.data.player.PlayerMountDataCommon;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.block.PassableProperty;
@@ -45,7 +45,6 @@ import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Direction;
 
 import java.util.Optional;
@@ -77,11 +76,12 @@ public class Mount implements Consumer<Task>
         this.movementHandler = getHandler(mount.getType(), mountData.canFly());
     }
 
-    public void mountPlayer(Object plugin)
+    public void mountPlayer(MountsPlugin plugin)
     {
+        mountData.clampSpeeds(plugin.config().speeds());
+
         if (player.getWorld().spawnEntity(vehicle, Cause.source(PLUGIN_SPAWN).named(NamedCause.simulated(player)).build()))
         {
-            vehicle.offer(Keys.DISPLAY_NAME, Text.of(player.getName() + "'s Epic Mount!"));
             Sponge.getScheduler().createTaskBuilder()
                     .delayTicks(1L)
                     .execute(() -> {

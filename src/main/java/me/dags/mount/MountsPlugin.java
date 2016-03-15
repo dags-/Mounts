@@ -27,14 +27,21 @@ package me.dags.mount;
 import com.google.inject.Inject;
 import me.dags.commandbus.CommandBus;
 import me.dags.dalib.config.ConfigLoader;
-import me.dags.mount.data.PlayerMountDataBuilder;
-import me.dags.mount.data.PlayerMountDataImmutable;
-import me.dags.mount.data.PlayerMountDataMutable;
+import me.dags.mount.commands.AdminCommands;
+import me.dags.mount.commands.UserCommands;
+import me.dags.mount.data.mount.MountDataBuilder;
+import me.dags.mount.data.mount.MountDataImmutable;
+import me.dags.mount.data.mount.MountDataMutable;
+import me.dags.mount.data.player.PlayerMountDataBuilder;
+import me.dags.mount.data.player.PlayerMountDataImmutable;
+import me.dags.mount.data.player.PlayerMountDataMutable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.DefaultConfig;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -70,6 +77,7 @@ public class MountsPlugin
     {
         logger.info("Registering MountData...");
         Sponge.getDataManager().register(PlayerMountDataMutable.class, PlayerMountDataImmutable.class, new PlayerMountDataBuilder());
+        Sponge.getDataManager().register(MountDataMutable.class, MountDataImmutable.class, new MountDataBuilder());
     }
 
     @Listener
@@ -77,7 +85,8 @@ public class MountsPlugin
     {
         reloadConfig();
         logger.info("Registering Commands...");
-        CommandBus.newSilentInstance().register(new MountCommands(this)).submit(this);
+        CommandBus.newSilentInstance().register(new UserCommands(this)).register(new AdminCommands(this)).submit(this);
+        test();
     }
 
     @Listener
@@ -90,8 +99,13 @@ public class MountsPlugin
     @Listener
     public void use(InteractBlockEvent.Secondary event, @Root Player player)
     {
+        if (!player.hasPermission(Permissions.MOUNT_USE))
+        {
+            return;
+        }
+
         Optional<ItemStack> inHand = player.getItemInHand();
-        if (player.hasPermission(Permissions.MOUNT_USE) && inHand.isPresent() && !player.getVehicle().isPresent())
+        if (inHand.isPresent() && !player.getVehicle().isPresent())
         {
             player.get(PlayerMountDataMutable.class)
                     .filter(data -> data.itemType() == inHand.get().getItem())
@@ -108,16 +122,29 @@ public class MountsPlugin
     public void clearMounts()
     {
         Sponge.getServer().getWorlds()
-                .forEach(w -> w.getEntities(e -> {
-                    Optional<Text> name = e.get(Keys.DISPLAY_NAME);
-                    return name.isPresent() && name.get().toPlain().endsWith("'s Epic Mount!");
-                }).forEach(Entity::remove));
+                .forEach(w -> w.getEntities(e -> e.get(MountDataMutable.class).isPresent())
+                        .forEach(Entity::remove));
     }
 
     public void reloadConfig()
     {
+        logger.info("Loading Config...");
         Optional<Config> optional = configLoader.fromHocon(configPath, Config.class);
         config = optional.isPresent() ? optional.get() : new Config();
         configLoader.toHocon(config, configPath);
+    }
+
+    private void test()
+    {
+        CommandSpec spec = CommandSpec.builder()
+                .arguments(GenericArguments.player(Text.of("test")))
+                .executor((source, context) -> {
+                    if (context.hasAny("test"))
+                    {
+                        System.out.println(context.getOne("test"));
+                    }
+                    return CommandResult.success();
+                }).build();
+        Sponge.getCommandManager().register(this, spec, "test");
     }
 }

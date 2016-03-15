@@ -22,12 +22,14 @@
  * THE SOFTWARE.
  */
 
-package me.dags.mount.data;
+package me.dags.mount.data.player;
 
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.immutable.common.AbstractImmutableData;
 import org.spongepowered.api.data.value.BaseValue;
+
+import me.dags.mount.data.MountKeys;
 
 import java.util.Optional;
 

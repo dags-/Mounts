@@ -22,40 +22,55 @@
  * THE SOFTWARE.
  */
 
-package me.dags.mount.data;
+package me.dags.mount.data.mount;
 
-import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
+import me.dags.mount.data.MountKeys;
+import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.manipulator.immutable.common.AbstractImmutableData;
 
-import java.util.Optional;
-
-/**
- * @author dags <dags@dags.me>
- */
-
-public class PlayerMountDataBuilder implements DataManipulatorBuilder<PlayerMountDataMutable, PlayerMountDataImmutable>
+public class MountDataImmutable extends AbstractImmutableData<MountDataImmutable, MountDataMutable>
 {
-    @Override
-    public PlayerMountDataMutable create()
+    private final MountDataCommon mountData;
+
+    protected MountDataImmutable()
     {
-        return new PlayerMountDataMutable();
+        this(new MountDataCommon());
+    }
+
+    protected MountDataImmutable(MountDataCommon mountData)
+    {
+        this.mountData = mountData;
+        registerGetters();
     }
 
     @Override
-    public Optional<PlayerMountDataMutable> createFrom(DataHolder dataHolder)
+    public MountDataMutable asMutable()
     {
-        return Optional.of(dataHolder.get(PlayerMountDataMutable.class).orElse(create()));
+        return new MountDataMutable(mountData.copy());
     }
 
     @Override
-    public Optional<PlayerMountDataMutable> build(DataView dataView)
+    public int compareTo(MountDataImmutable arg0)
     {
-        Optional<PlayerMountDataCommon> mountInfo = PlayerMountDataCommon.fromContainer(dataView);
-        if (mountInfo.isPresent())
-        {
-            return Optional.of(new PlayerMountDataMutable(mountInfo.get()));
-        }
-        return Optional.empty();
+        return 0;
+    }
+
+    @Override
+    public int getContentVersion()
+    {
+        return MountDataCommon.CONTENT_VERSION;
+    }
+
+    @Override
+    protected void registerGetters()
+    {
+        registerFieldGetter(MountKeys.IS_MOUNT, () -> mountData.dummy);
+        registerKeyValue(MountKeys.IS_MOUNT, () -> mountData.dummy().asImmutable());
+    }
+
+    @Override
+    public DataContainer toContainer()
+    {
+        return mountData.toContainer();
     }
 }

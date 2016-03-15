@@ -22,53 +22,47 @@
  * THE SOFTWARE.
  */
 
-package me.dags.mount;
+package me.dags.mount.commands;
 
 import me.dags.commandbus.annotation.Caller;
 import me.dags.commandbus.annotation.Command;
 import me.dags.commandbus.annotation.One;
 import me.dags.dalib.commands.CommandMessenger;
+import me.dags.mount.MountsPlugin;
+import me.dags.mount.Permissions;
 import me.dags.mount.data.MountKeys;
-import me.dags.mount.data.PlayerMountDataMutable;
+import me.dags.mount.data.player.PlayerMountDataMutable;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 /**
  * @author dags <dags@dags.me>
  */
 
-public class MountCommands
+public class UserCommands
 {
     private final MountsPlugin plugin;
 
-    protected MountCommands(MountsPlugin plugin)
+    public UserCommands(MountsPlugin plugin)
     {
         this.plugin = plugin;
     }
 
     private CommandMessenger.Builder messenger()
     {
-        return plugin.config().commandMessenger.builder();
-    }
-
-    @Command(aliases = {"reload", "r"}, parent = "mount", perm = Permissions.COMMAND_RELOAD)
-    public void reload(@Caller Player player)
-    {
-        messenger().info("Reloading...").tell(player);
-        plugin.reloadConfig();
-    }
-
-    @Command(aliases = {"purge", "p"}, parent = "mount", perm = Permissions.COMMAND_PURGE)
-    public void purge(@Caller Player player)
-    {
-        messenger().info("Reloading...").tell(player);
-        plugin.clearMounts();
+        return plugin.config().messenger().builder();
     }
 
     @Command(aliases = {"create", "c"}, parent = "mount", perm = Permissions.COMMAND_CREATE)
@@ -80,44 +74,89 @@ public class MountCommands
         }
 
         PlayerMountDataMutable data = new PlayerMountDataMutable();
-        data.setEntityType(plugin.config().defaultMount.entityType);
-        data.setSpawnItem(plugin.config().defaultMount.spawnItem);
-        data.setLeashItem(plugin.config().defaultMount.leashItem);
-        data.set(MountKeys.CAN_FLY, plugin.config().defaultMount.canFly);
-        data.set(MountKeys.INVINCIBLE, plugin.config().defaultMount.invincible);
-        data.set(MountKeys.MOVE_SPEED, plugin.config().defaultMount.moveSpeed);
-        data.set(MountKeys.LEASH_SPEED, plugin.config().defaultMount.leashSpeed);
+        data.setEntityType(plugin.config().defaults().type());
+        data.setSpawnItem(plugin.config().defaults().spawnItem());
+        data.setLeashItem(plugin.config().defaults().leashItem());
+        data.set(MountKeys.CAN_FLY, plugin.config().defaults().canFly());
+        data.set(MountKeys.INVINCIBLE, plugin.config().defaults().invincible());
+        data.set(MountKeys.MOVE_SPEED, plugin.config().defaults().normalSpeed());
+        data.set(MountKeys.LEASH_SPEED, plugin.config().defaults().leashSpeed());
         player.offer(data);
 
         messenger().info("Successfully created your new mount!").tell(player);
     }
 
-    @Command(aliases = {"remove", "r", "delete", "d"}, parent = "mount", perm = Permissions.COMMAND_REMOVE_SELF)
-    public void removeSelf(@Caller Player player)
+    @Command(aliases = {"canfly", "fly", "f"}, parent = "mount", perm = Permissions.COMMAND_FLY)
+    public void fly(@Caller Player player)
+    {
+        toggle(player, MountKeys.CAN_FLY, "flight");
+    }
+
+    @Command(aliases = {"invincible", "i"}, parent = "mount", perm = Permissions.COMMAND_INVINCIBLE)
+    public void invincible(@Caller Player player)
+    {
+        toggle(player, MountKeys.INVINCIBLE, "invincibility");
+    }
+
+    @Command(aliases = {"item", "i"}, parent = "mount", perm = Permissions.COMMAND_ITEM)
+    public void item(@Caller Player player)
+    {
+        setItem(player, (d, i) -> d.setSpawnItem(i.getName()));
+    }
+
+    @Command(aliases = {"leash", "lead", "l"}, parent = "mount", perm = Permissions.COMMAND_LEASH)
+    public void leash(@Caller Player player)
+    {
+        setItem(player, (d, i) -> d.setLeashItem(i.getName()));
+    }
+
+    @Command(aliases = {"reset", "r"}, parent = "mount", perm = Permissions.COMMAND_RESET_SELF)
+    public void reset(@Caller Player player)
     {
         if (!player.get(PlayerMountDataMutable.class).isPresent())
         {
-            messenger().error("You do not have a mount to remove!").tell(player);
+            messenger().error("You do not have a mount to reset!").tell(player);
             return;
         }
 
         player.remove(PlayerMountDataMutable.class);
-        messenger().info("Removed your mount!").tell(player);
+        messenger().info("Reset your mount! Use '").stress("/mount create").info("' to create a new one").tell(player);
     }
 
-    // FIXME: 13/03/2016
-    //@Command(aliases = {"other", "o"}, parent = "mount remove", perm = Permissions.COMMAND_REMOVE_OTHER)
-    public void removeOther(@Caller Player player, @One Player target)
+    @Command(aliases = {"leash", "leashed", "l"}, parent = "mount speed", perm = Permissions.COMMAND_SPEED)
+    public void speedLeash(@Caller Player player, @One("speed") double speed)
     {
-        if (!target.get(PlayerMountDataMutable.class).isPresent())
+        if (plugin.config().speeds().outsideOfRange(speed))
         {
-            messenger().stress(target.getName()).error(" does not have a mount to remove!").tell(player);
+            messenger().stress(speed)
+                    .info(" is not within the allowed range: ")
+                    .stress(plugin.config().speeds().getRange())
+                    .tell(player);
             return;
         }
 
-        target.remove(PlayerMountDataMutable.class);
-        messenger().stress(player.getName()).info(" removed your mount!").tell(target);
-        messenger().info("You removed ").stress(target.getName()).info("'s mount!").tell(target);
+        if (set(player, MountKeys.LEASH_SPEED, speed))
+        {
+            messenger().info("Your mount's leashed speed has been set to: ").stress(speed).tell(player);
+        }
+    }
+
+    @Command(aliases = {"normal", "n"}, parent = "mount speed", perm = Permissions.COMMAND_SPEED)
+    public void speedNormal(@Caller Player player, @One("speed") double speed)
+    {
+        if (plugin.config().speeds().outsideOfRange(speed))
+        {
+            messenger().stress(speed)
+                    .info(" is not within the allowed range: ")
+                    .stress(plugin.config().speeds().getRange())
+                    .tell(player);
+            return;
+        }
+
+        if (set(player, MountKeys.MOVE_SPEED, speed))
+        {
+            messenger().info("Your mount's speed has been set to: ").stress(speed).tell(player);
+        }
     }
 
     @Command(aliases = {"type", "t"}, parent = "mount", perm = Permissions.COMMAND_TYPE)
@@ -135,64 +174,16 @@ public class MountCommands
         }
     }
 
-    @Command(aliases = {"item", "i"}, parent = "mount", perm = Permissions.COMMAND_ITEM)
-    public void item(@Caller Player player)
+    @Command(aliases = "types", parent = "mount", perm = Permissions.COMMAND_TYPES)
+    public void types(@Caller CommandSource source)
     {
-        setItem(player, (d, i) -> d.setSpawnItem(i.getName()));
-    }
-
-    @Command(aliases = {"leash", "lead", "l"}, parent = "mount", perm = Permissions.COMMAND_LEASH)
-    public void leash(@Caller Player player)
-    {
-        setItem(player, (d, i) -> d.setLeashItem(i.getName()));
-    }
-
-    @Command(aliases = {"normal", "n"}, parent = "mount speed", perm = Permissions.COMMAND_SPEED)
-    public void speedNormal(@Caller Player player, @One("speed") double speed)
-    {
-        if (plugin.config().mountSpeeds.outsideOfRange(speed))
-        {
-            messenger().stress(speed)
-                    .info(" is not within the allowed range: ")
-                    .stress(plugin.config().mountSpeeds.getRange())
-                    .tell(player);
-            return;
-        }
-
-        if (set(player, MountKeys.MOVE_SPEED, speed))
-        {
-            messenger().info("Your mount's speed has been set to: ").stress(speed).tell(player);
-        }
-    }
-
-    @Command(aliases = {"leash", "leashed", "l"}, parent = "mount speed", perm = Permissions.COMMAND_SPEED)
-    public void speedLeash(@Caller Player player, @One("speed") double speed)
-    {
-        if (plugin.config().mountSpeeds.outsideOfRange(speed))
-        {
-            messenger().stress(speed)
-                    .info(" is not within the allowed range: ")
-                    .stress(plugin.config().mountSpeeds.getRange())
-                    .tell(player);
-            return;
-        }
-
-        if (set(player, MountKeys.LEASH_SPEED, speed))
-        {
-            messenger().info("Your mount's leashed speed has been set to: ").stress(speed).tell(player);
-        }
-    }
-
-    @Command(aliases = {"canfly", "fly", "f"}, parent = "mount", perm = Permissions.COMMAND_FLY)
-    public void fly(@Caller Player player)
-    {
-        toggle(player, MountKeys.CAN_FLY, "flight");
-    }
-
-    @Command(aliases = {"invincible", "i"}, parent = "mount", perm = Permissions.COMMAND_INVINCIBLE)
-    public void invincible(@Caller Player player)
-    {
-        toggle(player, MountKeys.INVINCIBLE, "invincibility");
+        List<String> names = Sponge.getRegistry().getAllOf(EntityType.class).stream()
+                .filter(t -> Living.class.isAssignableFrom(t.getEntityClass()))
+                .distinct()
+                .map(EntityType::getName)
+                .sorted()
+                .collect(Collectors.toList());
+        messenger().info("Available Mount types: ").stress(names).tell(source);
     }
 
     private boolean toggle(Player player, Key<Value<Boolean>> key, String settingName)

@@ -43,6 +43,8 @@ public class MountKeys
     public static final Key<Value<Double>> MOVE_SPEED = single(Double.class, "MOVE_SPEED");
     public static final Key<Value<Double>> LEASH_SPEED = single(Double.class, "LEASH_SPEED");
 
+    public static final Key<Value<Boolean>> IS_MOUNT = single(Boolean.class, "IS_MOUNT");
+
     private static <T> Key<Value<T>> single(Class<T> type, String query)
     {
         return KeyFactory.makeSingleKey(type, Value.class, DataQuery.of(query));
