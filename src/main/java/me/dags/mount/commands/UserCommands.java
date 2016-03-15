@@ -31,12 +31,7 @@ import me.dags.dalib.commands.CommandMessenger;
 import me.dags.mount.MountsPlugin;
 import me.dags.mount.Permissions;
 import me.dags.mount.data.MountKeys;
-<<<<<<< HEAD:src/main/java/me/dags/mount/commands/UserCommands.java
 import me.dags.mount.data.player.PlayerMountDataMutable;
-=======
-import me.dags.mount.data.PlayerMountDataMutable;
-
->>>>>>> origin/master:src/main/java/me/dags/mount/MountCommands.java
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Key;
@@ -67,10 +62,7 @@ public class UserCommands
 
     private CommandMessenger.Builder messenger()
     {
-<<<<<<< HEAD:src/main/java/me/dags/mount/commands/UserCommands.java
         return plugin.config().messenger().builder();
-=======
-        return plugin.config().commandMessenger.builder();
     }
 
     @Command(aliases = {"reload", "r"}, parent = "mount", perm = Permissions.COMMAND_RELOAD)
@@ -85,19 +77,6 @@ public class UserCommands
     {
         messenger().info("Reloading...").tell(source);
         plugin.clearMounts();
->>>>>>> origin/master:src/main/java/me/dags/mount/MountCommands.java
-    }
-
-    @Command(aliases = "types", parent = "mount", perm = Permissions.COMMAND_TYPES)
-    public void types(@Caller CommandSource source)
-    {
-        List<String> names = Sponge.getRegistry().getAllOf(EntityType.class).stream()
-                .filter(t -> Living.class.isAssignableFrom(t.getEntityClass()))
-                .distinct()
-                .map(EntityType::getName)
-                .sorted()
-                .collect(Collectors.toList());
-        messenger().info("Available Mount types: ").stress(names).tell(source);
     }
 
     @Command(aliases = {"create", "c"}, parent = "mount", perm = Permissions.COMMAND_CREATE)
