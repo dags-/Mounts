@@ -43,6 +43,7 @@ public class Permissions
     public static final String COMMAND_REMOVE_OTHER = "mounts.command.remove.other";
     public static final String COMMAND_SPEED = "mounts.command.speed";
     public static final String COMMAND_TYPE = "mounts.command.type";
+    public static final String COMMAND_TYPES = "mounts.command.types";
 
     public static final String MOUNT_USE = "mounts.use";
 
