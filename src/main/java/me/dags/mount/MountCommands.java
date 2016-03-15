@@ -30,14 +30,21 @@ import me.dags.commandbus.annotation.One;
 import me.dags.dalib.commands.CommandMessenger;
 import me.dags.mount.data.MountKeys;
 import me.dags.mount.data.PlayerMountDataMutable;
+
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 /**
  * @author dags <dags@dags.me>
@@ -58,17 +65,29 @@ public class MountCommands
     }
 
     @Command(aliases = {"reload", "r"}, parent = "mount", perm = Permissions.COMMAND_RELOAD)
-    public void reload(@Caller Player player)
+    public void reload(@Caller CommandSource source)
     {
-        messenger().info("Reloading...").tell(player);
+        messenger().info("Reloading...").tell(source);
         plugin.reloadConfig();
     }
 
     @Command(aliases = {"purge", "p"}, parent = "mount", perm = Permissions.COMMAND_PURGE)
-    public void purge(@Caller Player player)
+    public void purge(@Caller CommandSource source)
     {
-        messenger().info("Reloading...").tell(player);
+        messenger().info("Reloading...").tell(source);
         plugin.clearMounts();
+    }
+
+    @Command(aliases = "types", parent = "mount", perm = Permissions.COMMAND_TYPES)
+    public void types(@Caller CommandSource source)
+    {
+        List<String> names = Sponge.getRegistry().getAllOf(EntityType.class).stream()
+                .filter(t -> Living.class.isAssignableFrom(t.getEntityClass()))
+                .distinct()
+                .map(EntityType::getName)
+                .sorted()
+                .collect(Collectors.toList());
+        messenger().info("Available Mount types: ").stress(names).tell(source);
     }
 
     @Command(aliases = {"create", "c"}, parent = "mount", perm = Permissions.COMMAND_CREATE)
