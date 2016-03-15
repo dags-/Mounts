@@ -38,9 +38,6 @@ import me.dags.mount.data.player.PlayerMountDataMutable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
@@ -52,7 +49,6 @@ import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.text.Text;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -86,7 +82,6 @@ public class MountsPlugin
         reloadConfig();
         logger.info("Registering Commands...");
         CommandBus.newSilentInstance().register(new UserCommands(this)).register(new AdminCommands(this)).submit(this);
-        test();
     }
 
     @Listener
@@ -132,19 +127,5 @@ public class MountsPlugin
         Optional<Config> optional = configLoader.fromHocon(configPath, Config.class);
         config = optional.isPresent() ? optional.get() : new Config();
         configLoader.toHocon(config, configPath);
-    }
-
-    private void test()
-    {
-        CommandSpec spec = CommandSpec.builder()
-                .arguments(GenericArguments.player(Text.of("test")))
-                .executor((source, context) -> {
-                    if (context.hasAny("test"))
-                    {
-                        System.out.println(context.getOne("test"));
-                    }
-                    return CommandResult.success();
-                }).build();
-        Sponge.getCommandManager().register(this, spec, "test");
     }
 }
