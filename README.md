@@ -55,6 +55,15 @@ _('&' color codes are not supported)_
 - `mounts.type.<entity_type>` - allows user to set their mount to a specific entity type
 - `mounts.use` - allows user to right-click their mount item in order to spawn it
 
+To give a user permission to use a particular entity type, use the `mounts.type.<entity_type>` node (where you replace `<entity_type>` with the name of the entity you'd like to allow [no spaces]).
+
+Examples:
+```
+mounts.type.wolf
+mounts.type.chicken
+mounts.type.enderdragon
+```
+
 ## Notes
 - **If the server does not shut down correctly, some mount entities may persist in the world after it starts again**
 - **Flying around quickly may put stress on the server's hardware as it has to load chunks more quickly than usual**
