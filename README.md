@@ -4,7 +4,7 @@
 [![build](https://img.shields.io/badge/issues-track-orange.svg)](https://github.com/dags-/Mounts/issues "View/Create Issues") 
 
 Mounts is a Sponge plugin that allows players to create personal, rideable mounts from Minecraft mobs.
-![squid](https://raw.githubusercontent.com/dags-/Mounts/img/flyingsquid.gif)
+[![squid](https://raw.githubusercontent.com/dags-/Mounts/img/flyingsquid.gif)](https://youtu.be/DJ_yejdiH98 "Click for demo video!")
 
 ## Quick Start
 Create your mount by using the `/mount create` command. You will then be able to spawn your mount by right-clicking the assigned item (a saddle by default).
