@@ -27,7 +27,6 @@ package me.dags.mount.data.player;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
-import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 
 import java.util.Optional;
@@ -36,13 +35,8 @@ import java.util.Optional;
  * @author dags <dags@dags.me>
  */
 
-public class PlayerMountDataBuilder extends AbstractDataBuilder<PlayerMountDataMutable> implements DataManipulatorBuilder<PlayerMountDataMutable, PlayerMountDataImmutable>
+public class PlayerMountDataBuilder implements DataManipulatorBuilder<PlayerMountDataMutable, PlayerMountDataImmutable>
 {
-    public PlayerMountDataBuilder()
-    {
-        super(PlayerMountDataMutable.class, PlayerMountDataCommon.DATA_VERSION);
-    }
-
     @Override
     public PlayerMountDataMutable create()
     {
@@ -56,13 +50,9 @@ public class PlayerMountDataBuilder extends AbstractDataBuilder<PlayerMountDataM
     }
 
     @Override
-    protected Optional<PlayerMountDataMutable> buildContent(DataView container) throws InvalidDataException
+    public Optional<PlayerMountDataMutable> build(DataView dataView) throws InvalidDataException
     {
-        Optional<PlayerMountDataCommon> mountInfo = PlayerMountDataCommon.fromContainer(container);
-        if (mountInfo.isPresent())
-        {
-            return Optional.of(new PlayerMountDataMutable(mountInfo.get()));
-        }
-        return Optional.empty();
+        Optional<PlayerMountDataCommon> common = PlayerMountDataCommon.fromContainer(dataView);
+        return common.isPresent() ? Optional.of(new PlayerMountDataMutable(common.get())) : Optional.empty();
     }
 }

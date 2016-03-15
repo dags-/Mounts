@@ -27,25 +27,12 @@ package me.dags.mount.data.mount;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
-import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 
 import java.util.Optional;
 
-public class MountDataBuilder extends AbstractDataBuilder<MountDataMutable> implements DataManipulatorBuilder<MountDataMutable, MountDataImmutable>
+public class MountDataBuilder implements DataManipulatorBuilder<MountDataMutable, MountDataImmutable>
 {
-    public MountDataBuilder()
-    {
-        super(MountDataMutable.class, MountDataCommon.CONTENT_VERSION);
-    }
-
-    @Override
-    protected Optional<MountDataMutable> buildContent(DataView container) throws InvalidDataException
-    {
-        Optional<MountDataCommon> mountInfo = MountDataCommon.fromContainer(container);
-        return mountInfo.isPresent() ? Optional.of(new MountDataMutable(mountInfo.get())) : Optional.empty();
-    }
-
     @Override
     public MountDataMutable create()
     {
@@ -56,5 +43,12 @@ public class MountDataBuilder extends AbstractDataBuilder<MountDataMutable> impl
     public Optional<MountDataMutable> createFrom(DataHolder dataHolder)
     {
         return Optional.of(dataHolder.get(MountDataMutable.class).orElse(create()));
+    }
+
+    @Override
+    public Optional<MountDataMutable> build(DataView dataView) throws InvalidDataException
+    {
+        Optional<MountDataCommon> common = MountDataCommon.fromContainer(dataView);
+        return common.isPresent() ? Optional.of(new MountDataMutable(common.get())) : Optional.empty();
     }
 }
