@@ -52,8 +52,8 @@ _('&' color codes are not supported)_
 - `mounts.command.speed` - allows use of the `/mount speed` commands
 - `mounts.command.type` - allows use of the `/mount type` command
 - `mounts.command.types` - allows use of the `/mount types` command
-- `mounts.use` - allows user to right-click their mount item in order to spawn it
 - `mounts.type.<entity_type>` - allows user to set their mount to a specific entity type
+- `mounts.use` - allows user to right-click their mount item in order to spawn it
 
 ## Notes
 - **If the server does not shut down correctly, some mount entities may persist in the world after it starts again**
