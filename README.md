@@ -21,7 +21,6 @@ There are 3 main sections:
 - `command_colors` - configure the colors of `/mount` command messages
 - `default_mount` - define the default properties of a newly created mount
 - `speed_limits` - allows you to globally set minimum and maximum speeds for mounts  
-_('&' color codes are not supported)_
 
 ## Commands
 - `/mount create` - create a new mount
