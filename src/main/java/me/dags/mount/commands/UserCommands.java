@@ -27,7 +27,7 @@ package me.dags.mount.commands;
 import me.dags.commandbus.annotation.Caller;
 import me.dags.commandbus.annotation.Command;
 import me.dags.commandbus.annotation.One;
-import me.dags.dalib.commands.CommandMessenger;
+import me.dags.dlib.commands.CommandMessenger;
 import me.dags.mount.MountsPlugin;
 import me.dags.mount.Permissions;
 import me.dags.mount.data.MountKeys;
@@ -75,7 +75,7 @@ public class UserCommands
     @Command(aliases = {"purge", "p"}, parent = "mount", perm = Permissions.COMMAND_PURGE)
     public void purge(@Caller CommandSource source)
     {
-        messenger().info("Reloading...").tell(source);
+        messenger().info("Purging...").tell(source);
         plugin.clearMounts();
     }
 

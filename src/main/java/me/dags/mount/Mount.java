@@ -29,6 +29,7 @@ import com.flowpowered.math.vector.Vector3d;
 import me.dags.mount.data.player.PlayerMountDataCommon;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.property.AbstractProperty;
 import org.spongepowered.api.data.property.block.PassableProperty;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
@@ -43,8 +44,11 @@ import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Direction;
 
 import java.util.Optional;
@@ -76,7 +80,7 @@ public class Mount implements Consumer<Task>
         this.movementHandler = getHandler(mount.getType(), mountData.canFly());
     }
 
-    public void mountPlayer(MountsPlugin plugin)
+    boolean mountPlayer(MountsPlugin plugin)
     {
         mountData.clampSpeeds(plugin.config().speeds());
 
@@ -86,6 +90,8 @@ public class Mount implements Consumer<Task>
                     .delayTicks(1L)
                     .execute(() -> {
                         player.setVehicle(vehicle);
+                        vehicle.offer(Keys.PERSISTS, false);
+                        vehicle.offer(Keys.DISPLAY_NAME, Text.of(mountData.name()));
                         vehicle.offer(Keys.TAMED_OWNER, Optional.of(player.getUniqueId()));
                         Sponge.getScheduler().createTaskBuilder()
                                 .delayTicks(1L)
@@ -94,13 +100,16 @@ public class Mount implements Consumer<Task>
                                 .submit(plugin);
                     }).submit(plugin);
             Sponge.getEventManager().registerListeners(plugin, this);
+            return true;
         }
+        return false;
     }
 
-    private void dismount()
+    void dismount()
     {
-        Sponge.getEventManager().unregisterListeners(this);
         vehicle.remove();
+        MountsPlugin.removeMount(this);
+        Sponge.getEventManager().unregisterListeners(this);
         if (task.isPresent())
         {
             task.get().cancel();
@@ -159,8 +168,8 @@ public class Mount implements Consumer<Task>
 
     private double currentSpeed()
     {
-        Optional<ItemStack> inHand = player.getItemInHand();
-        return inHand.isPresent() && inHand.get().getItem() == mountData.getLeashItem() ? mountData.getLeashSpeed() : mountData.getMoveSpeed();
+        ItemType inHand = player.getItemInHand().map(ItemStack::getItem).orElse(ItemTypes.NONE);
+        return inHand == mountData.getLeashItem() ? mountData.getLeashSpeed() : mountData.getMoveSpeed();
     }
 
     private interface Handler
@@ -205,7 +214,7 @@ public class Mount implements Consumer<Task>
             Vector3d ahead = direction(rotation).mul(1, 0, 1);
             Optional<PassableProperty> passable = mount.vehicle.getLocation().add(ahead).getProperty(PassableProperty.class);
 
-            if (passable.filter(p -> p.getValue() != null && !p.getValue()).isPresent() && canJump(mount.vehicle))
+            if (!passable.map(AbstractProperty::getValue).orElse(true) && canJump(mount.vehicle))
             {
                 velocity = velocity.add(0, 0.15 + (speed * 0.15), 0);
             }
@@ -217,16 +226,12 @@ public class Mount implements Consumer<Task>
 
     private static boolean canJump(Living mount)
     {
-        if (mount.isOnGround())
-        {
-            return true;
-        }
-        Optional<PassableProperty> p1 = mount.getLocation()
+        return mount.isOnGround() || !mount.getLocation()
                 .getRelative(Direction.DOWN)
                 .getRelative(Direction.DOWN)
-                .getProperty(PassableProperty.class);
-
-        return p1.isPresent() && p1.get().getValue() != null && !p1.get().getValue();
+                .getProperty(PassableProperty.class)
+                .map(AbstractProperty::getValue)
+                .orElse(false);
     }
 
     private static Vector3d direction(Vector3d rotation)

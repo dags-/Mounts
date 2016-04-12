@@ -27,13 +27,16 @@ package me.dags.mount.commands;
 import me.dags.commandbus.annotation.Caller;
 import me.dags.commandbus.annotation.Command;
 import me.dags.commandbus.annotation.One;
-import me.dags.dalib.commands.CommandMessenger;
+import me.dags.dlib.commands.CommandMessenger;
 import me.dags.mount.MountsPlugin;
 import me.dags.mount.Permissions;
-import me.dags.mount.data.mount.MountDataMutable;
 import me.dags.mount.data.player.PlayerMountDataMutable;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
+
+import java.util.Optional;
 
 /**
  * @author dags <dags@dags.me>
@@ -63,11 +66,12 @@ public class AdminCommands
     @Command(aliases = {"purge", "p"}, parent = "mount", perm = Permissions.COMMAND_PURGE)
     public void purgeUser(@Caller CommandSource source, @One("target") Player target)
     {
-        if (target.getVehicle().isPresent() && target.getVehicle().get().get(MountDataMutable.class).isPresent())
+        Optional<Entity> optional = target.getVehicle();
+        if (optional.isPresent() && optional.get() instanceof Living)
         {
             messenger().info("Purging ").stress(target.getName()).info("'s mount...").tell(source);
             messenger().stress(source.getName()).info(" purged your mount!").tell(target);
-            target.getVehicle().get().remove();
+            optional.get().remove();
         }
     }
 

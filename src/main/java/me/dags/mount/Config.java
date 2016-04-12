@@ -24,7 +24,7 @@
 
 package me.dags.mount;
 
-import me.dags.dalib.commands.CommandMessenger;
+import me.dags.dlib.commands.CommandMessenger;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
@@ -115,9 +115,9 @@ public class Config
     public static class MountSpeeds
     {
         @Setting
-        protected double minSpeed = 0.01D;
+        double minSpeed = 0.01D;
         @Setting
-        protected double maxSpeed = 5.0D;
+        double maxSpeed = 5.0D;
 
         public boolean outsideOfRange(double test)
         {

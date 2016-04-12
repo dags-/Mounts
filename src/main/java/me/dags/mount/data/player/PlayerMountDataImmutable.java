@@ -39,14 +39,14 @@ import java.util.Optional;
 
 public class PlayerMountDataImmutable extends AbstractImmutableData<PlayerMountDataImmutable, PlayerMountDataMutable>
 {
-    protected final PlayerMountDataCommon common;
+    private final PlayerMountDataCommon common;
 
     public PlayerMountDataImmutable()
     {
         this(new PlayerMountDataCommon());
     }
 
-    public PlayerMountDataImmutable(PlayerMountDataCommon info)
+    PlayerMountDataImmutable(PlayerMountDataCommon info)
     {
         this.common = new PlayerMountDataCommon(info);
         registerGetters();

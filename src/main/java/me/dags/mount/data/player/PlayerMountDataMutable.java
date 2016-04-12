@@ -27,8 +27,6 @@ package me.dags.mount.data.player;
 import com.flowpowered.math.vector.Vector3d;
 import me.dags.mount.Mount;
 import me.dags.mount.data.MountKeys;
-import me.dags.mount.data.mount.MountDataMutable;
-
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
@@ -59,7 +57,7 @@ public class PlayerMountDataMutable extends AbstractData<PlayerMountDataMutable,
         this(new PlayerMountDataCommon());
     }
 
-    public PlayerMountDataMutable(PlayerMountDataCommon info)
+    PlayerMountDataMutable(PlayerMountDataCommon info)
     {
         this.common = info;
         registerGettersAndSetters();
@@ -71,8 +69,6 @@ public class PlayerMountDataMutable extends AbstractData<PlayerMountDataMutable,
         if (optional.isPresent())
         {
             Living entity = optional.get();
-            entity.offer(new MountDataMutable());
-            entity.offer(Keys.DISPLAY_NAME, Text.of(common.name));
             return Optional.of(new Mount(player, entity, common));
         }
         return Optional.empty();

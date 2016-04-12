@@ -45,27 +45,27 @@ import java.util.Optional;
 
 public class PlayerMountDataCommon
 {
-    protected static final int DATA_VERSION = 1;
+    static final int DATA_VERSION = 1;
 
-    protected String type = EntityTypes.PIG.getName();
-    protected String item = ItemTypes.SADDLE.getName();
-    protected String leash = ItemTypes.LEAD.getName();
+    String type = EntityTypes.PIG.getName();
+    String item = ItemTypes.SADDLE.getName();
+    String leash = ItemTypes.LEAD.getName();
     // TODO
-    protected String name = "Dennis";
+    String name = "Dennis";
 
-    protected boolean canFly = true;
-    protected boolean invincible = true;
-    protected double moveSpeed = 0.25D;
-    protected double leashSpeed = 0.05D;
+    boolean canFly = true;
+    boolean invincible = true;
+    double moveSpeed = 0.25D;
+    double leashSpeed = 0.05D;
 
-    protected transient EntityType entityType = EntityTypes.PIG;
-    protected transient ItemType spawnItem = ItemTypes.SADDLE;
-    protected transient ItemType leashItem = ItemTypes.LEAD;
+    transient EntityType entityType = EntityTypes.PIG;
+    transient ItemType spawnItem = ItemTypes.SADDLE;
+    private transient ItemType leashItem = ItemTypes.LEAD;
 
-    protected PlayerMountDataCommon()
+    PlayerMountDataCommon()
     {}
 
-    protected PlayerMountDataCommon(PlayerMountDataCommon info)
+    PlayerMountDataCommon(PlayerMountDataCommon info)
     {
         this.type = info.type;
         this.item = info.item;
@@ -79,7 +79,7 @@ public class PlayerMountDataCommon
         this.leashItem = info.leashItem;
     }
 
-    public PlayerMountDataCommon set(DataView dataContainer)
+    private PlayerMountDataCommon set(DataView dataContainer)
     {
         this.type = dataContainer.getString(MountKeys.TYPE.getQuery()).get();
         this.item = dataContainer.getString(MountKeys.SPAWN_ITEM.getQuery()).get();
@@ -87,10 +87,8 @@ public class PlayerMountDataCommon
         this.invincible = dataContainer.getBoolean(MountKeys.INVINCIBLE.getQuery()).get();
         this.moveSpeed = dataContainer.getDouble(MountKeys.MOVE_SPEED.getQuery()).get();
         this.leashSpeed = dataContainer.getDouble(MountKeys.LEASH_SPEED.getQuery()).get();
-        Optional<EntityType> t = Sponge.getRegistry().getType(EntityType.class, this.type);
-        Optional<ItemType> i = Sponge.getRegistry().getType(ItemType.class, this.item);
-        this.entityType = t.isPresent() ? t.get() : entityType;
-        this.spawnItem = i.isPresent() ? i.get() : spawnItem;
+        this.entityType = Sponge.getRegistry().getType(EntityType.class, type).orElse(entityType);
+        this.spawnItem = Sponge.getRegistry().getType(ItemType.class, this.item).orElse(spawnItem);
         return this;
     }
 
@@ -120,19 +118,9 @@ public class PlayerMountDataCommon
         return leashSpeed;
     }
 
-    public void setEntityType(EntityType type)
+    public String name()
     {
-        this.entityType = type;
-    }
-
-    public void setSpawnItem(ItemType type)
-    {
-        this.spawnItem = type;
-    }
-
-    public void setLeashItem(ItemType type)
-    {
-        this.leashItem = type;
+        return name;
     }
 
     public ItemType getSpawnItem()
@@ -145,42 +133,57 @@ public class PlayerMountDataCommon
         return leashItem;
     }
 
-    public Value<String> type()
+    void setEntityType(EntityType type)
+    {
+        this.entityType = type;
+    }
+
+    void setSpawnItem(ItemType type)
+    {
+        this.spawnItem = type;
+    }
+
+    void setLeashItem(ItemType type)
+    {
+        this.leashItem = type;
+    }
+
+    Value<String> type()
     {
         return Sponge.getRegistry().getValueFactory().createValue(MountKeys.TYPE, "pig", type);
     }
 
-    public Value<String> spawnItem()
+    Value<String> spawnItem()
     {
         return Sponge.getRegistry().getValueFactory().createValue(MountKeys.SPAWN_ITEM, "saddle", item);
     }
 
-    public Value<String> leashItem()
+    Value<String> leashItem()
     {
         return Sponge.getRegistry().getValueFactory().createValue(MountKeys.LEASH_ITEM, "lead", leash);
     }
 
-    public Value<Boolean> fly()
+    Value<Boolean> fly()
     {
         return Sponge.getRegistry().getValueFactory().createValue(MountKeys.CAN_FLY, false, canFly);
     }
 
-    public Value<Boolean> invincible()
+    Value<Boolean> invincible()
     {
         return Sponge.getRegistry().getValueFactory().createValue(MountKeys.INVINCIBLE, false, invincible);
     }
 
-    public Value<Double> moveSpeed()
+    Value<Double> moveSpeed()
     {
         return Sponge.getRegistry().getValueFactory().createValue(MountKeys.MOVE_SPEED, 0.2D, moveSpeed);
     }
 
-    public Value<Double> leashSpeed()
+    Value<Double> leashSpeed()
     {
         return Sponge.getRegistry().getValueFactory().createValue(MountKeys.LEASH_SPEED, 0.1D, leashSpeed);
     }
 
-    public DataContainer toContainer()
+    DataContainer toContainer()
     {
         return new MemoryDataContainer()
                 .set(Queries.CONTENT_VERSION, DATA_VERSION)
@@ -193,7 +196,7 @@ public class PlayerMountDataCommon
                 .set(MountKeys.LEASH_SPEED, leashSpeed);
     }
 
-    public static Optional<PlayerMountDataCommon> fromContainer(DataView dataContainer)
+    static Optional<PlayerMountDataCommon> fromContainer(DataView dataContainer)
     {
         if (!dataContainer.contains(
                 MountKeys.TYPE.getQuery(),

@@ -26,12 +26,9 @@ package me.dags.mount;
 
 import com.google.inject.Inject;
 import me.dags.commandbus.CommandBus;
-import me.dags.dalib.config.ConfigLoader;
+import me.dags.dlib.config.ConfigLoader;
 import me.dags.mount.commands.AdminCommands;
 import me.dags.mount.commands.UserCommands;
-import me.dags.mount.data.mount.MountDataBuilder;
-import me.dags.mount.data.mount.MountDataImmutable;
-import me.dags.mount.data.mount.MountDataMutable;
 import me.dags.mount.data.player.PlayerMountDataBuilder;
 import me.dags.mount.data.player.PlayerMountDataImmutable;
 import me.dags.mount.data.player.PlayerMountDataMutable;
@@ -39,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.DefaultConfig;
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
@@ -51,15 +47,20 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.plugin.Plugin;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author dags <dags@dags.me>
  */
 
-@Plugin(name = "Mounts", id = "me.dags.mounts", version = "1.1.0", description = "Turn mobs into mounts!", authors = "dags", url = "https://github.com/dags-/Mounts")
+@Plugin(name = "Mounts", id = "me.dags.mounts", version = "1.1.1", description = "Turn mobs into mounts!", authors = "dags", url = "https://github.com/dags-/Mounts")
 public class MountsPlugin
 {
+    private static final Set<Mount> activeMounts = new HashSet<>();
+
     @Inject
     @DefaultConfig(sharedRoot = false)
     private Path configPath;
@@ -73,7 +74,6 @@ public class MountsPlugin
     {
         logger.info("Registering MountData...");
         Sponge.getDataManager().register(PlayerMountDataMutable.class, PlayerMountDataImmutable.class, new PlayerMountDataBuilder());
-        Sponge.getDataManager().register(MountDataMutable.class, MountDataImmutable.class, new MountDataBuilder());
     }
 
     @Listener
@@ -94,19 +94,22 @@ public class MountsPlugin
     @Listener
     public void use(InteractBlockEvent.Secondary event, @Root Player player)
     {
-        if (!player.hasPermission(Permissions.MOUNT_USE))
+        if (!player.hasPermission(Permissions.MOUNT_USE) || player.getVehicle().isPresent())
         {
             return;
         }
 
-        Optional<ItemStack> inHand = player.getItemInHand();
-        if (inHand.isPresent() && !player.getVehicle().isPresent())
-        {
-            player.get(PlayerMountDataMutable.class)
-                    .filter(data -> data.itemType() == inHand.get().getItem())
-                    .flatMap(data -> data.createPlayMount(player))
-                    .ifPresent(mount -> mount.mountPlayer(this));
-        }
+        player.getItemInHand()
+                .map(ItemStack::getItem)
+                .ifPresent(item -> player.get(PlayerMountDataMutable.class)
+                        .filter(data -> data.itemType() == item)
+                        .flatMap(data -> data.createPlayMount(player))
+                        .filter(mount -> mount.mountPlayer(this))
+                        .ifPresent(mount -> {
+                            activeMounts.add(mount);
+                            event.setCancelled(true);
+                        })
+                );
     }
 
     public Config config()
@@ -116,9 +119,7 @@ public class MountsPlugin
 
     public void clearMounts()
     {
-        Sponge.getServer().getWorlds()
-                .forEach(w -> w.getEntities(e -> e.get(MountDataMutable.class).isPresent())
-                        .forEach(Entity::remove));
+        new ArrayList<>(activeMounts).forEach(Mount::dismount);
     }
 
     public void reloadConfig()
@@ -127,5 +128,10 @@ public class MountsPlugin
         Optional<Config> optional = configLoader.fromHocon(configPath, Config.class);
         config = optional.isPresent() ? optional.get() : new Config();
         configLoader.toHocon(config, configPath);
+    }
+
+    static boolean removeMount(Mount mount)
+    {
+        return activeMounts.remove(mount);
     }
 }
