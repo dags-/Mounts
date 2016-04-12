@@ -65,8 +65,6 @@ mounts.type.enderdragon
 ```
 
 ## Notes
-- **If the server does not shut down correctly, some mount entities may persist in the world after it starts again**
-- **Flying around quickly may put stress on the server's hardware as it has to load chunks more quickly than usual**
 - User experience may vary depending on latency
 - Aggressive mounts may still try to attack you in Survival/Adventure mode
 - The player's riding position may not always be perfectly on the mounts back
